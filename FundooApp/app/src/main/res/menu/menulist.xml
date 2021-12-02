@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group>
+    <item
+        android:title="Notes"
+        android:id="@+id/notes"
+        android:icon="@drawable/notes_asset"/>
+
+    <item
+        android:title="Archive"
+        android:id="@+id/archive"
+        android:icon="@drawable/archive_asset">
+    </item>
+
+    <item
+        android:title="delete"
+        android:id="@+id/delete"
+        android:icon="@drawable/delete_asset"/>
+
+    <item
+        android:title="logout"
+        android:id="@+id/logout"
+        android:icon="@drawable/logout_asset"/>
+
+</group>
+
+</menu>
