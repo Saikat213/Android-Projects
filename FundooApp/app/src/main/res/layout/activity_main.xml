@@ -4,55 +4,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_image"
     tools:context=".MainActivity">
 
+<!--    <include android:id="@+id/mainToolBar"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        layout="@layout/toolbar_layout" />-->
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="244dp"
-        android:layout_height="104dp"
-        android:layout_marginTop="88dp"
-        android:gravity="center"
-        android:text="FundooApp"
-        android:textColor="@color/black"
-        android:textSize="40dp"
-        android:textStyle="bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <TextView-->
+<!--        android:id="@+id/textView"-->
+<!--        android:layout_width="244dp"-->
+<!--        android:layout_height="104dp"-->
+<!--        android:layout_marginTop="88dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="FundooApp"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textSize="40dp"-->
+<!--        android:textStyle="bold|italic"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.497"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <TextView
-        android:id="@+id/Login"
-        android:layout_width="165dp"
-        android:layout_height="59dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="Login"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+<!--    <TextView-->
+<!--        android:id="@+id/Login"-->
+<!--        android:layout_width="165dp"-->
+<!--        android:layout_height="59dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Login"-->
+<!--        android:textSize="25dp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textView" />-->
 
-    <TextView
-        android:id="@+id/registerUser"
-        android:layout_width="0dp"
-        android:layout_height="58dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="Don't have account? SignUp"
-        android:textColor="#FFEB3B"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Login" />
-
+<!--    <TextView-->
+<!--        android:id="@+id/registerUser"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="58dp"-->
+<!--        android:layout_marginEnd="32dp"-->
+<!--        android:layout_marginStart="32dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Don't have account? SignUp"-->
+<!--        android:textColor="#FFEB3B"-->
+<!--        android:textSize="24sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.0"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/Login" />-->
+<!--*/-->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"

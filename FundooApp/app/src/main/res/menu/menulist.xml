@@ -21,7 +21,20 @@
         android:title="logout"
         android:id="@+id/logout"
         android:icon="@drawable/logout_asset"/>
-
 </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:title="Share"
+                android:icon="@drawable/ic_share" />
+
+            <item
+                android:id="@+id/nav_send"
+                android:title="Send"
+                android:icon="@drawable/ic_send" />
+        </menu>
+    </item>
 
 </menu>
