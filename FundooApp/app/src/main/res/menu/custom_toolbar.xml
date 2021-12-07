@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Search"
+        android:id="@+id/search"
+        android:iconTint="@color/black"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="always" />
+
+    <item
+        android:title="Settings"
+        android:id="@+id/settings"
+        android:iconTint="@color/black"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="always"/>
+
+    <item
+        android:title="Profile"
+        android:id="@+id/UserProfile"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_account">
+        <menu>
+            <item
+                android:title="My Profile"
+                android:id="@+id/profile" />
+
+            <item
+                android:title="Sign Out"
+                android:id="@+id/signout" />
+        </menu>
+    </item>
+
+    <item
+        android:title="Share"
+        android:id="@+id/share" />
+
+    <item
+        android:title="About"
+        android:id="@+id/about" />
+
+    <item
+        android:title="Exit"
+        android:id="@+id/exit" />
+
+</menu>

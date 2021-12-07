@@ -38,10 +38,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/login_emailID" />
 
     <EditText
-        android:id="@+id/emailAddress"
+        android:id="@+id/login_emailID"
         android:layout_width="0dp"
         android:layout_height="63dp"
         android:layout_marginEnd="32dp"

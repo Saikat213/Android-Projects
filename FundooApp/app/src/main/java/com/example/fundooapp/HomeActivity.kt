@@ -45,13 +45,13 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when(item.itemId) {
             R.id.notes ->
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragmentContainerView, NotesFragment())
+                    replace(R.id.fragmentContainer, NotesFragment())
                     commit()
                 }
 
             R.id.archive ->
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragmentContainerView, ArchiveFragment())
+                    replace(R.id.fragmentContainer, ArchiveFragment())
                     commit()
                 }
 

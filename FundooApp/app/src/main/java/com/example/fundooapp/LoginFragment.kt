@@ -9,25 +9,21 @@ import androidx.fragment.app.Fragment
 import android.widget.*
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundooapp.model.UserAuthService
-import com.example.fundooapp.viewmodel.LoginViewModel
-import com.example.fundooapp.viewmodel.LoginViewModelFactory
-import com.example.fundooapp.viewmodel.SharedViewModel
-import com.example.fundooapp.viewmodel.SharedViewModelFactory
-import com.google.android.gms.tasks.OnCompleteListener
+import com.example.fundooapp.viewmodel.*
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
-    lateinit var inputEmail : EditText
-    lateinit var inputPassword : EditText
-    lateinit var firebaseAuth : FirebaseAuth
-    lateinit var loginViewModel : LoginViewModel
-    lateinit var sharedViewModel : SharedViewModel
-    lateinit var createNewAccount : TextView
-    lateinit var btnLogin : Button
+    private lateinit var inputEmail: EditText
+    private lateinit var inputPassword: EditText
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var createNewAccount: TextView
+    private lateinit var btnLogin: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,17 +33,20 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         var view: View = inflater.inflate(R.layout.fragment_login, container, false)
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory(UserAuthService()))
             .get(LoginViewModel::class.java)
-        sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory(UserAuthService()))[SharedViewModel::class.java]
+        sharedViewModel = ViewModelProvider(
+            requireActivity(),
+            SharedViewModelFactory(UserAuthService())
+        )[SharedViewModel::class.java]
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        inputEmail = view.findViewById(R.id.emailAddress)
+        inputEmail = view.findViewById(R.id.login_emailID)
         inputPassword = view.findViewById(R.id.LoginPassword)
         createNewAccount = view.findViewById(R.id.createNewAccount)
-        btnLogin = view.findViewById<Button>(R.id.loginButton)
+        btnLogin = view.findViewById(R.id.loginButton)
         firebaseAuth = FirebaseAuth.getInstance()
 
         gotoRegisterPage()
@@ -72,17 +71,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    fun gotoRegisterPage() {
+    private fun gotoRegisterPage() {
         createNewAccount.setOnClickListener {
             Toast.makeText(requireContext(), "CHeck", Toast.LENGTH_SHORT).show()
-            sharedViewModel.gotoregistrationPage(true)
-            //sharedViewModel.gotoHomePage(false)
+            sharedViewModel.gotoRegistrationPage(true)
         }
-    }
-
-
-    private fun navigateUserToHomeScreen() {
-        var changeToActivity = Intent(this.context, HomeActivity::class.java)
-        startActivity(changeToActivity)
     }
 }

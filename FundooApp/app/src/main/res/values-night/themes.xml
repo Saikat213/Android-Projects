@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.FundooApp" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="Theme.FundooApp" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="android:colorPrimaryDark">@color/purple_700</item>
@@ -13,7 +13,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorControlActivated</item>
         <!-- Customize your theme here. -->
     </style>
-    <style name="AppThemeMaterial" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppThemeMaterial" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/design_default_color_primary</item>
         <item name="colorPrimaryDark">@color/common_google_signin_btn_text_dark_focused</item>

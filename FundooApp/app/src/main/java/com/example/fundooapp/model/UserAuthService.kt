@@ -4,7 +4,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 
 class UserAuthService {
-    lateinit var firebaseAuth: FirebaseAuth
+    private var firebaseAuth: FirebaseAuth
 
     init {
         firebaseAuth = FirebaseAuth.getInstance()
@@ -15,6 +15,8 @@ class UserAuthService {
             OnCompleteListener {
                 if (it.isSuccessful) {
                     listener(AuthListener(status = it.isSuccessful, "login Successful"))
+                } else {
+                    listener(AuthListener(status = it.isSuccessful, "Login Failed.. try again"))
                 }
             })
     }
