@@ -28,4 +28,18 @@ class UserAuthService {
             }
         }
     }
+
+    fun resetPassword(email : String, listener: (AuthListener) -> Unit) {
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener {
+            if (it.isSuccessful) {
+                listener(AuthListener(status = it.isSuccessful, "Reset link sent"))
+            } else {
+                listener(AuthListener(status = it.isSuccessful, "Reset Link failed to sent"))
+            }
+        }
+    }
+
+    fun signOut() {
+        firebaseAuth.signOut()
+    }
 }

@@ -10,11 +10,13 @@
         android:id="@+id/notesTitle"
         android:layout_width="262dp"
         android:layout_height="60dp"
-        android:layout_marginTop="104dp"
-        android:ems="10"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
         android:hint="Title"
-        android:inputType="textPersonName"
-        android:textSize="30dp"
+        android:textSize="25dp"
+        app:layout_constraintBottom_toTopOf="@+id/notesDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.275"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,27 +26,46 @@
         android:id="@+id/notesDescription"
         android:layout_width="324dp"
         android:layout_height="359dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
-        android:gravity="start"
+        android:gravity="start|top"
+        android:bufferType="editable"
         android:hint="Content"
-        android:inputType="textPersonName"
-        android:textSize="20dp"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toTopOf="@+id/saveNotes"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.46"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/notesTitle" />
 
-    <androidx.appcompat.widget.Toolbar
+    <!--<androidx.appcompat.widget.Toolbar
         android:id="@+id/createNotes_Toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/create_notes_toolbar"
         app:layout_constraintBottom_toTopOf="@+id/notesTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        app:menu="@menu/create_notes_toolbar" />
+-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveNotes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_done"
+        app:maxImageSize="30dp"
+        android:backgroundTint="@color/teal_700"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.853"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/notesDescription"
+        app:layout_constraintVertical_bias="0.525">
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

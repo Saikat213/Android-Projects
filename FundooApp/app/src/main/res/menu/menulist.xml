@@ -3,7 +3,7 @@
 <group>
     <item
         android:title="Notes"
-        android:id="@+id/notes"
+        android:id="@+id/notes2345"
         android:icon="@drawable/notes_asset"/>
 
     <item

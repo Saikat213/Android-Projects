@@ -1,15 +1,13 @@
 package com.example.fundooapp
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,8 +15,9 @@ import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var sharedViewModel: SharedViewModel
     lateinit var drawer : DrawerLayout
@@ -43,11 +42,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
         toggle = ActionBarDrawerToggle(this, drawer, R.string.open, R.string.close)
-        toggle.syncState()
         drawer.addDrawerListener(toggle)
-        navView.setNavigationItemSelectedListener(this)
+
+        toggle.syncState()
         sharedViewModel.gotoLoginPage(true)
         observeAppNav()
+        //onNavigationItemSelected(drawer, navView)
     }
 
     private fun observeAppNav() {
@@ -80,24 +80,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
         sharedViewModel.gotoCreateNotesPageStatus.observe(this, Observer {
             if (it == true) {
+                supportActionBar?.hide()
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.fragmentContainer, CreateNotesFragment())
                     addToBackStack(null)
                     commit()
                 }
-                supportActionBar?.hide()
+
             }
         })
-    }
-
-    override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
-        var itemID = menuItem.itemId
-        when(itemID) {
-            R.id.notes -> Toast.makeText(this, "Notes", Toast.LENGTH_SHORT).show()
-            R.id.archive -> Toast.makeText(this, "Archive", Toast.LENGTH_SHORT).show()
-        }
-        drawer.closeDrawer(GravityCompat.START)
-        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -109,5 +100,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.custom_toolbar, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    fun toolbarIcon(context: Context, toolbar: Toolbar) {
+        toolbar.setOnMenuItemClickListener {
+            when(it.itemId) {
+                R.id.profile -> {
+                    Toast.makeText(context, "Profile", Toast.LENGTH_SHORT).show()
+                }
+                R.id.signout -> {
+                    var firebaseAuth = FirebaseAuth.getInstance()
+                    var shareViewModel = ViewModelProvider(
+                        this,
+                        SharedViewModelFactory(UserAuthService())
+                    )[SharedViewModel::class.java]
+                    firebaseAuth.signOut()
+                    shareViewModel.gotoLoginPage(true)
+                }
+            }
+            true
+        }
+    }
+
+    fun onNavigationItemSelected(drawerL : DrawerLayout, nav : NavigationView, context: Context) {
+        nav.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.notes2345 -> {
+                    Toast.makeText(context, "Notes", Toast.LENGTH_SHORT).show()
+                    drawerL.closeDrawers()
+                }
+                R.id.archive -> {
+                    Toast.makeText(context, "Archive", Toast.LENGTH_SHORT).show()
+                    drawerL.closeDrawers()
+                }
+            }
+            true
+        }
     }
 }

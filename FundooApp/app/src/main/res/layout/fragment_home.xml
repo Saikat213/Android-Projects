@@ -6,40 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".HomeFragment">
 
-    <!--<androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/drawerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:openDrawer="start">
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/navigationView"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="@color/teal_200"
-            android:fitsSystemWindows="true"
-            app:menu="@menu/menulist" />
-
-        <include
-            layout="@layout/custom_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </androidx.drawerlayout.widget.DrawerLayout>
--->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FAV_addNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:layout_marginBottom="40dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="30dp"
         android:backgroundTint="@color/teal_200"
         android:src="@drawable/fab_button"
         app:maxImageSize="35dp" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewLayout"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
