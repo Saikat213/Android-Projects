@@ -1,5 +1,6 @@
 package com.example.fundooapp
 
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.nfc.Tag
 import android.os.Bundle
@@ -33,9 +34,9 @@ class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
     lateinit var notesContent: EditText
     lateinit var saveNotes: FloatingActionButton
     lateinit var sharedViewModel: SharedViewModel
-    lateinit var fstore: FirebaseFirestore
+    var fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
     lateinit var firebaseAuth: FirebaseAuth
-    lateinit var userID: String
+    //lateinit var userID: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,10 +50,9 @@ class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
                 UserAuthService()
             )
         )[SharedViewModel::class.java]
-
         firebaseAuth = FirebaseAuth.getInstance()
-        fstore = FirebaseFirestore.getInstance()
-        userID = firebaseAuth.currentUser!!.uid
+        //fstore = FirebaseFirestore.getInstance()
+        //userID = firebaseAuth.currentUser!!.uid
         dataUploadToFirestore()
     }
 
@@ -70,6 +70,7 @@ class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
         saveNotes.setOnClickListener {
             val title = notesTitle.text.toString()
             val content = notesContent.text.toString()
+            var userID = FirebaseAuth.getInstance().currentUser!!.uid
 
             var documentReference =
                 fstore.collection("notes").document(userID).collection("My notes").document()
@@ -86,5 +87,13 @@ class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
                 Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    fun updateNotes(noteData : NotesData) {
+        var userID = FirebaseAuth.getInstance().currentUser!!.uid
+        var documentReference =
+            fstore.collection("notes").document(userID).collection("My notes").document(noteData.ID.toString())
+        documentReference.update("Title", "Monday")
+        documentReference.update("Content", "Aloo paratha")
     }
 }

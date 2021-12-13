@@ -1,13 +1,19 @@
 package com.example.fundooapp
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundooapp.model.NotesData
@@ -44,17 +50,30 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         recyclerView = view.findViewById(R.id.recyclerViewLayout)
         var drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawerLayout)
         var navView = requireActivity().findViewById<NavigationView>(R.id.navigationView)
-        recyclerView.layoutManager =
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        var context = requireContext()
+        var toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
+
+        recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
         var toggle = ActionBarDrawerToggle(requireActivity(), drawer, R.string.open, R.string.close)
         drawer.addDrawerListener(toggle)
         toggle.syncState()
-        var context = requireContext()
-        MainActivity().onNavigationItemSelected(drawer, navView, context)
+        //MainActivity().onNavigationItemSelected(drawer, navView, context)
         createNewNotes()
-        var toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
         MainActivity().toolbarIcon(context, toolbar)
         retrieveDatafromFirestore()
+        changeLayoutView(toolbar, recyclerView, context)
+    }
+
+    private fun changeLayoutView(toolbar: Toolbar, recyclerView: RecyclerView, context : Context) {
+        toolbar.setOnMenuItemClickListener {
+            when(it.itemId) {
+                R.id.LinearView ->
+                    recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                R.id.GridView ->
+                    recyclerView.layoutManager = GridLayoutManager(context,2)
+            }
+            true
+        }
     }
 
     private fun createNewNotes() {
@@ -87,13 +106,36 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     }
                     for (documents: DocumentChange in value?.documentChanges!!) {
                         if (documents.type == DocumentChange.Type.ADDED) {
+                            val data = documents.document.toObject(NotesData::class.java)
+                            data.ID = documents.document.id
                             Log.d("Firestore Data: ", documents.document.toString())
-                            userNotes.add(documents.document.toObject(NotesData::class.java))
+                            userNotes.add(data)
                         }
                     }
                     myAdapter.notifyDataSetChanged()
                     recyclerView.adapter = NoteAdapter(userNotes)
                 }
             })
+    }
+
+    fun deleteNotes(id: String) {
+        var userNotes = ArrayList<NotesData>()
+        var myAdapter = NoteAdapter(userNotes)
+        var db = FirebaseFirestore.getInstance()
+        var userID = FirebaseAuth.getInstance().currentUser!!.uid
+        Log.d("ID: ", id)
+        //var builder: AlertDialog.Builder
+
+        /*var builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Are you sure you want to delete?")
+        builder.setPositiveButton("Yes") { DialogInterface, which ->*/
+            db.collection("notes").document(userID).collection("My notes").document(id).delete()
+            //myAdapter.notifyDataSetChanged()
+            //startActivity(Intent(context, HomeFragment::class.java))
+        /*}
+        builder.setNegativeButton("No") { DialogInterface, which ->
+        }
+        var dialog = builder.create()
+        dialog.show()*/
     }
 }

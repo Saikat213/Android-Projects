@@ -33,13 +33,6 @@
                 android:textColor="@color/black"
                 android:textSize="20sp" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/menuIcon"
-                android:layout_weight="0"
-                android:src="@drawable/ic_options"/>
-
         </LinearLayout>
 
         <LinearLayout
@@ -60,5 +53,13 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/notesMenu"
+        android:layout_weight="0"
+        android:layout_gravity="right"
+        android:src="@drawable/ic_options"/>
 
 </androidx.cardview.widget.CardView>

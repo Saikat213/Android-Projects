@@ -8,10 +8,9 @@
     tools:context=".ArchiveFragment">
 
     <TextView
-        android:id="@+id/archive"
+        android:id="@+id/archiveTextView"
         android:layout_width="182dp"
         android:layout_height="78dp"
-        android:text="Archive"
         android:textSize="30dp"
         android:gravity="center"
         android:textColor="@color/black"

@@ -1,6 +1,7 @@
 package com.example.fundooapp
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -11,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
@@ -43,11 +45,11 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayUseLogoEnabled(true)
         toggle = ActionBarDrawerToggle(this, drawer, R.string.open, R.string.close)
         drawer.addDrawerListener(toggle)
+        toggle.isDrawerIndicatorEnabled = true
 
         toggle.syncState()
         sharedViewModel.gotoLoginPage(true)
         observeAppNav()
-        //onNavigationItemSelected(drawer, navView)
     }
 
     private fun observeAppNav() {
@@ -110,18 +112,18 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.signout -> {
                     var firebaseAuth = FirebaseAuth.getInstance()
-                    var shareViewModel = ViewModelProvider(
-                        this,
-                        SharedViewModelFactory(UserAuthService())
-                    )[SharedViewModel::class.java]
                     firebaseAuth.signOut()
-                    shareViewModel.gotoLoginPage(true)
+                    Toast.makeText(this, "Check", Toast.LENGTH_SHORT).show()
+                    /*supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.fragmentContainer, LoginFragment())
+                        commit()
+                    }*/
                 }
             }
-            true
+           true
         }
     }
-
+/*
     fun onNavigationItemSelected(drawerL : DrawerLayout, nav : NavigationView, context: Context) {
         nav.setNavigationItemSelectedListener {
             when (it.itemId) {
@@ -136,5 +138,5 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-    }
+    }*/
 }
