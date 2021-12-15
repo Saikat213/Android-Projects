@@ -1,13 +1,11 @@
 package com.example.fundooapp
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -15,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.NoteAdapter
@@ -31,21 +28,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var sharedViewModel: SharedViewModel
     lateinit var recyclerView: RecyclerView
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        var view = inflater.inflate(R.layout.fragment_home, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory(UserAuthService())
         )[SharedViewModel::class.java]
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         fabButton = view.findViewById(R.id.FAV_addNote)
         recyclerView = view.findViewById(R.id.recyclerViewLayout)
         var drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawerLayout)
@@ -119,23 +108,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     fun deleteNotes(id: String) {
-        var userNotes = ArrayList<NotesData>()
-        var myAdapter = NoteAdapter(userNotes)
-        var db = FirebaseFirestore.getInstance()
+        var firebaseAuth = FirebaseFirestore.getInstance()
         var userID = FirebaseAuth.getInstance().currentUser!!.uid
+        //val db = DatabaseHandler(requireContext())
         Log.d("ID: ", id)
-        //var builder: AlertDialog.Builder
-
-        /*var builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Are you sure you want to delete?")
-        builder.setPositiveButton("Yes") { DialogInterface, which ->*/
-            db.collection("notes").document(userID).collection("My notes").document(id).delete()
-            //myAdapter.notifyDataSetChanged()
-            //startActivity(Intent(context, HomeFragment::class.java))
-        /*}
-        builder.setNegativeButton("No") { DialogInterface, which ->
-        }
-        var dialog = builder.create()
-        dialog.show()*/
+        firebaseAuth.collection("notes").document(userID).collection("My notes").document(id).delete()
     }
 }

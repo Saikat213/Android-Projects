@@ -113,6 +113,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.signout -> {
                     var firebaseAuth = FirebaseAuth.getInstance()
                     firebaseAuth.signOut()
+                    finish()
+                    startActivity(Intent(context, MainActivity::class.java))
                     Toast.makeText(this, "Check", Toast.LENGTH_SHORT).show()
                     /*supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, LoginFragment())

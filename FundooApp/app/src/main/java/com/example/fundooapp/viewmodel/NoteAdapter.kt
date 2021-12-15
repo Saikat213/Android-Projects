@@ -1,31 +1,28 @@
 package com.example.fundooapp.viewmodel
 
 import android.app.Activity
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundooapp.CreateNotesFragment
 import com.example.fundooapp.HomeFragment
 import com.example.fundooapp.R
+import com.example.fundooapp.UpdateFragment
 import com.example.fundooapp.model.NotesData
-import com.example.fundooapp.model.UserAuthService
 
 class NoteAdapter(val dataSet: ArrayList<NotesData>) : RecyclerView.Adapter<NoteAdapter.RecyclerViewHolder>() {
-
-    class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-       lateinit var displayDataTitle : TextView
-       lateinit var displayDataContent : TextView
-       lateinit var imgButton : ImageView
+    inner class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var displayDataTitle : TextView
+        var displayDataContent : TextView
+        var imgButton : ImageView
 
         init {
             displayDataTitle = itemView.findViewById(R.id.tvtitle)
@@ -46,22 +43,37 @@ class NoteAdapter(val dataSet: ArrayList<NotesData>) : RecyclerView.Adapter<Note
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
         holder.bindData(dataSet[position])
-        var test : NotesData = dataSet[position]
-        holder.imgButton.setOnClickListener {
-            val popupMenu = PopupMenu(it.context, holder.imgButton)
+        var Notes : NotesData = dataSet[position]
+        holder.imgButton.setOnClickListener {v ->
+            val popupMenu = PopupMenu(v.context, holder.imgButton)
             popupMenu.menuInflater.inflate(R.menu.notes_options_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {
                 when(it.itemId) {
                     R.id.delete -> {
                         dataSet.removeAt(position)
-                        HomeFragment().deleteNotes(test?.ID!!)
+                        HomeFragment().deleteNotes(Notes?.ID!!)
                     }
+
                     R.id.edit -> {
-                        holder.bindData(test)
-                        CreateNotesFragment().updateNotes(test)
+                        val bundle = Bundle()
+                        bundle.putString("Title", Notes.Title)
+                        bundle.putString("Content", Notes.Content)
+                        bundle.putString("ID", Notes.ID)
+                        val updateFragment = UpdateFragment()
+                        bundle.putSerializable("NOTE_KEY", Notes)
+                        val activity = v.context as AppCompatActivity
+                        updateFragment.arguments = bundle
+                        activity.supportFragmentManager.beginTransaction().apply {
+                            replace(R.id.fragmentContainer, updateFragment)
+                            addToBackStack(null)
+                            commit()
+                        }
                     }
+
                     R.id.archive -> {
                         dataSet.removeAt(position)
+                        dataSet[position].Archive = true
+
                     }
                 }
                 notifyDataSetChanged()
