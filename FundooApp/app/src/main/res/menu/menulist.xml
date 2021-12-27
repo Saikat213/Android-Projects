@@ -12,15 +12,6 @@
         android:icon="@drawable/archive_asset">
     </item>
 
-    <item
-        android:title="delete"
-        android:id="@+id/delete"
-        android:icon="@drawable/delete_asset"/>
-
-    <item
-        android:title="logout"
-        android:id="@+id/logout"
-        android:icon="@drawable/logout_asset"/>
 </group>
 
     <item android:title="Communicate">

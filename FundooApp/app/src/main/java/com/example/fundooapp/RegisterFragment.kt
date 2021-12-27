@@ -23,23 +23,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     lateinit var sharedViewModel: SharedViewModel
     lateinit var signup: Button
 
-    /*override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        var view: View = inflater.inflate(R.layout.fragment_register, container, false)
-        registerViewModel =
-            ViewModelProvider(this, RegisterViewModelFactory(UserAuthService())).get(
-                RegisterViewModel::class.java
-            )
-        sharedViewModel = ViewModelProvider(
-            requireActivity(),
-            SharedViewModelFactory(UserAuthService())
-        )[SharedViewModel::class.java]
-        return view
-    }
-*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -56,7 +39,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         inputPassword = view.findViewById(R.id.register_password)
         confirmPassword = view.findViewById(R.id.confirmPassword)
         signup = view.findViewById(R.id.signupButton)
-        val loginAfterSignup = view.findViewById<TextView>(R.id.loginTextView)
         registerUser()
     }
 
@@ -80,7 +62,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 registerViewModel.registerUser(user)
                 registerViewModel.registerStatus.observe(viewLifecycleOwner, Observer {
                     if (it.status) {
-                        sharedViewModel.gotoHomePage(true)
+                        Toast.makeText(requireContext(), "Registration Success", Toast.LENGTH_SHORT).show()
+                        sharedViewModel.gotoLoginPage(true)
                     } else {
                         Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     }

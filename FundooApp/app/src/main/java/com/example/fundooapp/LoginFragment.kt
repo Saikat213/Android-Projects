@@ -73,7 +73,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private fun gotoRegisterPage() {
         createNewAccount.setOnClickListener {
-            Toast.makeText(requireContext(), "CHeck", Toast.LENGTH_SHORT).show()
             sharedViewModel.gotoRegistrationPage(true)
         }
     }

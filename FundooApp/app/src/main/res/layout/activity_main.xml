@@ -9,6 +9,11 @@
     tools:context=".MainActivity"
     tools:openDrawer="start">
 
+    <include
+        layout="@layout/custom_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
@@ -28,10 +33,5 @@
         android:background="@color/teal_200"
         android:fitsSystemWindows="true"
         app:menu="@menu/menulist" />
-
-    <include
-        layout="@layout/custom_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

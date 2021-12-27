@@ -13,10 +13,16 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorControlActivated</item>
         <!-- Customize your theme here. -->
     </style>
+
     <style name="AppThemeMaterial" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/design_default_color_primary</item>
         <item name="colorPrimaryDark">@color/common_google_signin_btn_text_dark_focused</item>
         <item name="colorAccent">@color/teal_200</item>
+    </style>
+
+    <style name="DialogStyle" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
     </style>
 </resources>

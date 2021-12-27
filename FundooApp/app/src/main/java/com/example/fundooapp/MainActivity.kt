@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -13,7 +14,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundooapp.model.NotesData
+import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
+import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
 import com.google.android.material.navigation.NavigationView
@@ -40,16 +43,14 @@ class MainActivity : AppCompatActivity() {
         )[SharedViewModel::class.java]
 
         setSupportActionBar(customToolbar)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayUseLogoEnabled(true)
         toggle = ActionBarDrawerToggle(this, drawer, R.string.open, R.string.close)
         drawer.addDrawerListener(toggle)
-        toggle.isDrawerIndicatorEnabled = true
-
         toggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toggle.isDrawerIndicatorEnabled = true
         sharedViewModel.gotoLoginPage(true)
         observeAppNav()
+        onNavigationItemSelected(drawer, navView, this)
     }
 
     private fun observeAppNav() {
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
             if (it == true) {
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.fragmentContainer, RegisterFragment())
+                    addToBackStack(null)
                     commit()
                 }
                 supportActionBar?.hide()
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             if (it == true) {
                 supportActionBar?.show()
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragmentContainer, HomeFragment())
+                    replace(R.id.fragmentContainer, HomeFragment(), "homeFragment")
                     commit()
                 }
             }
@@ -88,7 +90,6 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                     commit()
                 }
-
             }
         })
     }
@@ -104,41 +105,28 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    fun toolbarIcon(context: Context, toolbar: Toolbar) {
-        toolbar.setOnMenuItemClickListener {
-            when(it.itemId) {
-                R.id.profile -> {
-                    Toast.makeText(context, "Profile", Toast.LENGTH_SHORT).show()
-                }
-                R.id.signout -> {
-                    var firebaseAuth = FirebaseAuth.getInstance()
-                    firebaseAuth.signOut()
-                    finish()
-                    startActivity(Intent(context, MainActivity::class.java))
-                    Toast.makeText(this, "Check", Toast.LENGTH_SHORT).show()
-                    /*supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, LoginFragment())
-                        commit()
-                    }*/
-                }
-            }
-           true
-        }
-    }
-/*
     fun onNavigationItemSelected(drawerL : DrawerLayout, nav : NavigationView, context: Context) {
         nav.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.notes2345 -> {
-                    Toast.makeText(context, "Notes", Toast.LENGTH_SHORT).show()
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.fragmentContainer, HomeFragment())
+                        commit()
+                    }
                     drawerL.closeDrawers()
                 }
                 R.id.archive -> {
-                    Toast.makeText(context, "Archive", Toast.LENGTH_SHORT).show()
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.fragmentContainer, ArchiveFragment())
+                        addToBackStack(null)
+                        commit()
+                    }
                     drawerL.closeDrawers()
                 }
+                R.id.nav_share -> Toast.makeText(context, "Share Clicked", Toast.LENGTH_SHORT).show()
+                R.id.nav_send -> Toast.makeText(context, "Send Clicked", Toast.LENGTH_SHORT).show()
             }
             true
         }
-    }*/
+    }
 }

@@ -1,32 +1,47 @@
 package com.example.fundooapp
 
+import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import android.widget.ImageView
+import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.fundooapp.model.NotesData
+import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
+    val image_request = 1
+    lateinit var imageUri: Uri
     lateinit var fabButton: FloatingActionButton
     private lateinit var sharedViewModel: SharedViewModel
     lateinit var recyclerView: RecyclerView
+    lateinit var adapter: NoteAdapter
+    lateinit var searchData: SearchView
+    lateinit var imageBtn : ImageView
+    lateinit var userEmailID : TextView
+    lateinit var storageReference : StorageReference
+    lateinit var dbReference : DatabaseReference
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,29 +52,34 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         )[SharedViewModel::class.java]
         fabButton = view.findViewById(R.id.FAV_addNote)
         recyclerView = view.findViewById(R.id.recyclerViewLayout)
-        var drawer = requireActivity().findViewById<DrawerLayout>(R.id.drawerLayout)
-        var navView = requireActivity().findViewById<NavigationView>(R.id.navigationView)
+        searchData = activity?.findViewById(R.id.searchButton)!!
         var context = requireContext()
         var toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
-
-        recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
-        var toggle = ActionBarDrawerToggle(requireActivity(), drawer, R.string.open, R.string.close)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
-        //MainActivity().onNavigationItemSelected(drawer, navView, context)
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        var getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
+        adapter = NoteAdapter(getNotes, context)
+        recyclerView.adapter = adapter
         createNewNotes()
-        MainActivity().toolbarIcon(context, toolbar)
-        retrieveDatafromFirestore()
-        changeLayoutView(toolbar, recyclerView, context)
+        toolbarIcons(toolbar, recyclerView, context)
+        filterData()
     }
 
-    private fun changeLayoutView(toolbar: Toolbar, recyclerView: RecyclerView, context : Context) {
+    private fun toolbarIcons(toolbar: Toolbar, recyclerView: RecyclerView, context: Context) {
         toolbar.setOnMenuItemClickListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.LinearView ->
-                    recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                    recyclerView.layoutManager =
+                        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 R.id.GridView ->
-                    recyclerView.layoutManager = GridLayoutManager(context,2)
+                    recyclerView.layoutManager = GridLayoutManager(context, 2)
+                R.id.profile -> {
+                    profileDialog(context)
+                }
+                R.id.signout -> {
+                    var firebaseAuth = FirebaseAuth.getInstance()
+                    firebaseAuth.signOut()
+                    startActivity(Intent(context, MainActivity::class.java))
+                }
             }
             true
         }
@@ -71,47 +91,61 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    /*override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
-        var itemID = menuItem.itemId
-        when(itemID) {
-            R.id.notes -> Toast.makeText(requireContext(), "Notes", Toast.LENGTH_SHORT).show()
-            R.id.archive -> Toast.makeText(requireContext(), "Archive", Toast.LENGTH_SHORT).show()
-        }
-        drawer.closeDrawer(GravityCompat.START)
-        return true
-    }*/
+    fun filterData() {
+        searchData.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(text: String?): Boolean {
+                adapter.filter.filter(text)
+                return true
+            }
 
-    fun retrieveDatafromFirestore() {
-        var documentReference = FirebaseFirestore.getInstance()
-        var userID = FirebaseAuth.getInstance().currentUser!!.uid
-        var userNotes = ArrayList<NotesData>()
-        var myAdapter = NoteAdapter(userNotes)
-        documentReference.collection("notes").document(userID).collection("My notes")
-            .addSnapshotListener(object : EventListener<QuerySnapshot> {
-                override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
-                    if (error != null) {
-                        Log.d("Firebase error: ", error.message.toString())
-                        return
-                    }
-                    for (documents: DocumentChange in value?.documentChanges!!) {
-                        if (documents.type == DocumentChange.Type.ADDED) {
-                            val data = documents.document.toObject(NotesData::class.java)
-                            data.ID = documents.document.id
-                            Log.d("Firestore Data: ", documents.document.toString())
-                            userNotes.add(data)
-                        }
-                    }
-                    myAdapter.notifyDataSetChanged()
-                    recyclerView.adapter = NoteAdapter(userNotes)
-                }
-            })
+            override fun onQueryTextChange(text: String?): Boolean {
+                adapter.filter.filter(text)
+                recyclerView.adapter = adapter
+                adapter.notifyDataSetChanged()
+                return true
+            }
+
+        })
     }
 
-    fun deleteNotes(id: String) {
-        var firebaseAuth = FirebaseFirestore.getInstance()
-        var userID = FirebaseAuth.getInstance().currentUser!!.uid
-        //val db = DatabaseHandler(requireContext())
-        Log.d("ID: ", id)
-        firebaseAuth.collection("notes").document(userID).collection("My notes").document(id).delete()
+    fun profileDialog(context: Context) {
+        var firebaseAuth = FirebaseAuth.getInstance()
+        var uid = firebaseAuth.currentUser!!
+        storageReference = FirebaseStorage.getInstance().getReference("uploads")
+        dbReference = FirebaseDatabase.getInstance().getReference("uploads")
+
+        val builder = AlertDialog.Builder(context)
+        val view = layoutInflater.inflate(R.layout.custom_dialog_layout, null)
+        imageBtn = view.findViewById(R.id.profileImage)
+        userEmailID = view.findViewById(R.id.profileEmailID)
+        userEmailID.text = uid.email.toString()
+        builder.setView(view)
+        NotesServiceImpl().retrieveUserProfilePicture(context, storageReference, imageBtn)
+        imageBtn.setOnClickListener {
+            chooseImageFile()
+        }
+        builder.setMessage("Profile").setPositiveButton("SignOut", DialogInterface.OnClickListener { dialog, id ->
+            firebaseAuth.signOut()
+            startActivity(Intent(context, MainActivity::class.java))
+        }).setNegativeButton("Change Profile Picture", DialogInterface.OnClickListener { dialog, id ->
+            NotesServiceImpl().uploadUserProfilePicture(context, storageReference, dbReference, imageUri)
+        })
+        builder.create().show()
+    }
+
+    fun chooseImageFile() {
+        val intent = Intent()
+        intent.setType("image/*")
+        intent.setAction(Intent.ACTION_GET_CONTENT)
+        startActivityForResult(intent, image_request)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == image_request && resultCode == RESULT_OK && data != null && data.data != null) {
+            imageUri = data.data!!
+            imageBtn.setImageURI(imageUri)
+        }
     }
 }

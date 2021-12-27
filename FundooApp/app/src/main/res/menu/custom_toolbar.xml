@@ -4,9 +4,10 @@
 
     <item
         android:title="Search"
-        android:id="@+id/search"
+        android:id="@+id/searchButton"
         android:iconTint="@color/black"
         android:icon="@drawable/ic_search"
+        app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
 
     <item
@@ -15,6 +16,7 @@
         android:iconTint="@color/black"
         android:icon="@drawable/ic_align"
         app:showAsAction="always">
+
     <menu>
         <item
             android:title="Linear"
@@ -41,17 +43,5 @@
                 android:id="@+id/signout" />
         </menu>
     </item>
-
-    <item
-        android:title="Share"
-        android:id="@+id/share" />
-
-    <item
-        android:title="About"
-        android:id="@+id/about" />
-
-    <item
-        android:title="Exit"
-        android:id="@+id/exit" />
 
 </menu>
