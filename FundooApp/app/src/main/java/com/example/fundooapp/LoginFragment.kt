@@ -42,7 +42,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         inputEmail = view.findViewById(R.id.login_emailID)
         inputPassword = view.findViewById(R.id.LoginPassword)
         createNewAccount = view.findViewById(R.id.createNewAccount)
@@ -59,7 +58,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             var password = inputPassword.text.toString()
             if (password.isEmpty() || password.length < 6)
                 inputPassword.setError("Enter valid password")
-
             loginViewModel.loginToFundoo(emailID, password)
             loginViewModel.loginStatus.observe(viewLifecycleOwner, Observer {
                 Log.d(TAG, "loginUser: status ${it.status}")

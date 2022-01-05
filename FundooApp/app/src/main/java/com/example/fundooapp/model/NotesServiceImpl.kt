@@ -8,10 +8,15 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundooapp.DatabaseHandler
 import com.example.fundooapp.viewmodel.NoteAdapter
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
 
 class NotesServiceImpl {
     val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -47,10 +52,10 @@ class NotesServiceImpl {
     fun saveDataToFirestore(title: String, content: String, context: Context) {
         val fstore = FirebaseFirestore.getInstance()
         val database = DatabaseHandler(context)
-        var documentReference =
+        val documentReference =
             fstore.collection("notes").document(userID).collection("My notes").document()
 
-        var note = mutableMapOf<String, String>()
+        val note = mutableMapOf<String, String>()
         note.put("Title", title)
         note.put("Content", content)
         note.put("Archive", "false")
@@ -81,8 +86,9 @@ class NotesServiceImpl {
         imageUri: Uri
     ) {
         if (imageUri != null) {
+            //addUserDetails(imageUri, context)
             val fileReference: StorageReference =
-                storageReference.child("image/${System.currentTimeMillis()}.jpg")
+                storageReference.child("image/${userID}.jpg")
             fileReference.putFile(imageUri).addOnSuccessListener {
                 val uploadID = dbReference.push().key
                 dbReference.child(uploadID!!)
@@ -100,8 +106,23 @@ class NotesServiceImpl {
         storageReference: StorageReference,
         userImage: ImageView
     ) {
-        storageReference.child("image").downloadUrl.addOnSuccessListener {
-            userImage.setImageURI(it)
+        storageReference.child("image/${userID}.jpg").downloadUrl.addOnSuccessListener {
+            Picasso.with(context).load(it).into(userImage)
+        }.addOnFailureListener {
+            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun addUserDetails(imageUrl: String, context: Context) {
+        val firebaseStore = FirebaseFirestore.getInstance()
+        val userReference = firebaseStore.collection("notes").document(userID)
+
+        val userDetails = mutableMapOf<String, String>()
+        userDetails.put("Email", firebaseAuth.currentUser!!.email.toString())
+        userDetails.put("ImageUrl", imageUrl)
+
+        userReference.set(userDetails).addOnSuccessListener {
+            Toast.makeText(context, "User Details Uploaded", Toast.LENGTH_SHORT).show()
         }.addOnFailureListener {
             Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
         }

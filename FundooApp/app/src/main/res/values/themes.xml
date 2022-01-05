@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.FundooApp" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.FundooApp" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="android:colorPrimaryDark">@color/purple_700</item>
@@ -12,13 +12,43 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorControlActivated</item>
         <!-- Customize your theme here. -->
+        <item name="colorSurface">#30DFCF</item>
     </style>
 
-    <style name="AppThemeMaterial" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppThemeMaterial" parent="Theme.MaterialComponents.Light">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/design_default_color_primary</item>
+        <item name="colorSurface">#30DFCF</item>
+        <item name="android:layout_height">90dp</item>
+        <item name="android:layout_width">96dp</item>
         <item name="colorPrimaryDark">@color/common_google_signin_btn_text_dark_focused</item>
         <item name="colorAccent">@color/teal_200</item>
+        <item name="materialTimePickerStyle">@style/Widget.MaterialComponents.TimePicker</item>
+        <item name="materialCalendarStyle">@style/Widget.MaterialComponents.MaterialCalendar</item>
+        <item name="materialCalendarTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar</item>
+    </style>
+
+    <style name="DateThemeMaterial" parent="Theme.MaterialComponents.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/design_default_color_primary</item>
+        <item name="colorSurface">#30DFCF</item>
+        <item name="colorPrimaryDark">@color/common_google_signin_btn_text_dark_focused</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="materialTimePickerStyle">@style/Widget.MaterialComponents.TimePicker</item>
+        <item name="materialCalendarStyle">@style/Widget.MaterialComponents.MaterialCalendar</item>
+        <item name="materialCalendarTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar</item>
+    </style>
+
+    <style name="MaterialTimePickerTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/design_default_color_primary</item>
+        <item name="colorSurface">#30DFCF</item>
+        <item name="colorPrimaryDark">@color/common_google_signin_btn_text_dark_focused</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="materialTimePickerStyle">@style/Widget.MaterialComponents.TimePicker</item>
+        <item name="materialTimePickerTheme">@style/ThemeOverlay.MaterialComponents.TimePicker</item>
+        <item name="materialCalendarStyle">@style/Widget.MaterialComponents.MaterialCalendar</item>
+        <item name="materialCalendarTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar</item>
     </style>
 
     <style name="DialogStyle" parent="Theme.AppCompat.Dialog">

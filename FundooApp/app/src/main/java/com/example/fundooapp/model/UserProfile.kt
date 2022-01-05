@@ -1,3 +1,5 @@
 package com.example.fundooapp.model
 
-data class UserProfile(var emailID : String, var imageUri : String)
+import android.net.Uri
+
+data class UserProfile(val emailID: String, val imageUri: Uri?)

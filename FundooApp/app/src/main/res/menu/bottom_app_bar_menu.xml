@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/paint"
+        android:icon="@drawable/ic_brush"
+        android:title="Paint"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/microphone"
+        android:icon="@drawable/ic_mic"
+        android:title="RecordAudio"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/photo"
+        android:icon="@drawable/ic_photo"
+        android:title="Photo"
+        app:showAsAction="always" />
+
+</menu>

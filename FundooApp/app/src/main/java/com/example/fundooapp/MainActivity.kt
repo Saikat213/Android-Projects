@@ -23,7 +23,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var sharedViewModel: SharedViewModel
     lateinit var drawer : DrawerLayout
     lateinit var navView : NavigationView
@@ -33,7 +32,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         customToolbar = findViewById(R.id.customToolbar)
         drawer = findViewById(R.id.drawerLayout)
         navView = findViewById(R.id.navigationView)
@@ -41,7 +39,6 @@ class MainActivity : AppCompatActivity() {
             this,
             SharedViewModelFactory(UserAuthService())
         )[SharedViewModel::class.java]
-
         setSupportActionBar(customToolbar)
         toggle = ActionBarDrawerToggle(this, drawer, R.string.open, R.string.close)
         drawer.addDrawerListener(toggle)

@@ -33,15 +33,6 @@
         android:id="@+id/UserProfile"
         app:showAsAction="always"
         android:icon="@drawable/ic_account">
-        <menu>
-            <item
-                android:title="My Profile"
-                android:id="@+id/profile" />
-
-            <item
-                android:title="Sign Out"
-                android:id="@+id/signout" />
-        </menu>
     </item>
 
 </menu>

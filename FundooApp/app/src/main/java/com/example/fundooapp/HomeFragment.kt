@@ -8,10 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.SearchView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +20,7 @@ import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -31,10 +29,10 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
-    val image_request = 1
     lateinit var imageUri: Uri
     lateinit var fabButton: FloatingActionButton
-    private lateinit var sharedViewModel: SharedViewModel
+    lateinit var bottomAppBar : BottomAppBar
+    lateinit var sharedViewModel: SharedViewModel
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: NoteAdapter
     lateinit var searchData: SearchView
@@ -45,23 +43,35 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val context = requireContext()
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory(UserAuthService())
         )[SharedViewModel::class.java]
         fabButton = view.findViewById(R.id.FAV_addNote)
+        bottomAppBar = view.findViewById(R.id.bottomAppBar)
         recyclerView = view.findViewById(R.id.recyclerViewLayout)
         searchData = activity?.findViewById(R.id.searchButton)!!
-        var context = requireContext()
-        var toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        var getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
+        val getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
         adapter = NoteAdapter(getNotes, context)
         recyclerView.adapter = adapter
         createNewNotes()
+        appBarIcons(context, bottomAppBar)
         toolbarIcons(toolbar, recyclerView, context)
         filterData()
+    }
+
+    private fun appBarIcons(context: Context, bottomAppBar: BottomAppBar) {
+        bottomAppBar.setOnMenuItemClickListener {
+            when(it.itemId) {
+                R.id.paint -> Toast.makeText(context, "To be continued...", Toast.LENGTH_SHORT).show()
+                R.id.microphone -> Toast.makeText(context, "Audio record", Toast.LENGTH_SHORT).show()
+                R.id.photo -> Toast.makeText(context, "To be implemented..", Toast.LENGTH_SHORT).show()
+            }
+            true
+        }
     }
 
     private fun toolbarIcons(toolbar: Toolbar, recyclerView: RecyclerView, context: Context) {
@@ -72,14 +82,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 R.id.GridView ->
                     recyclerView.layoutManager = GridLayoutManager(context, 2)
-                R.id.profile -> {
-                    profileDialog(context)
-                }
-                R.id.signout -> {
-                    var firebaseAuth = FirebaseAuth.getInstance()
-                    firebaseAuth.signOut()
-                    startActivity(Intent(context, MainActivity::class.java))
-                }
+                R.id.UserProfile -> profileDialog(context)
             }
             true
         }
@@ -109,11 +112,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     fun profileDialog(context: Context) {
-        var firebaseAuth = FirebaseAuth.getInstance()
-        var uid = firebaseAuth.currentUser!!
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val uid = firebaseAuth.currentUser!!
         storageReference = FirebaseStorage.getInstance().getReference("uploads")
         dbReference = FirebaseDatabase.getInstance().getReference("uploads")
-
         val builder = AlertDialog.Builder(context)
         val view = layoutInflater.inflate(R.layout.custom_dialog_layout, null)
         imageBtn = view.findViewById(R.id.profileImage)
@@ -128,6 +130,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             firebaseAuth.signOut()
             startActivity(Intent(context, MainActivity::class.java))
         }).setNegativeButton("Change Profile Picture", DialogInterface.OnClickListener { dialog, id ->
+            storageReference.child("image/${uid.uid}.jpg").delete()
             NotesServiceImpl().uploadUserProfilePicture(context, storageReference, dbReference, imageUri)
         })
         builder.create().show()
@@ -147,5 +150,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             imageUri = data.data!!
             imageBtn.setImageURI(imageUri)
         }
+    }
+
+    companion object {
+      private const val image_request = 1
     }
 }

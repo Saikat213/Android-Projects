@@ -4,27 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/updateLayout"
     tools:context=".HomeFragment">
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:backgroundTint="#2196F3"
+        app:elevation="20dp"
+        app:fabCradleMargin="10dp"
+        app:fabCradleVerticalOffset="10dp"
+        app:fabCradleRoundedCornerRadius="30dp"
+        app:fabAlignmentMode="end"
+        app:hideOnScroll="true"
+        app:menu="@menu/bottom_app_bar_menu"
+        android:theme="@style/AppThemeMaterial"
+        style="@style/Widget.MaterialComponents.BottomAppBar"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FAV_addNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="30dp"
-        android:backgroundTint="@color/teal_200"
+        android:backgroundTint="#ED4D42"
         android:src="@drawable/fab_button"
+        app:layout_anchor="@id/bottomAppBar"
+        app:tint="@color/white"
         app:maxImageSize="35dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLayout"
-        android:layout_marginTop="70dp"
+        android:layout_width="394dp"
+        android:layout_height="520dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="70dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

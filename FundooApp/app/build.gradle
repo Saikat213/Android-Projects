@@ -53,9 +53,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:"
     implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'com.android.support:appcompat-v7:30.1.0'
-    implementation 'com.android.support:design:30.1.0'
+    implementation 'com.android.support:appcompat-v7:31.1.0'
+    implementation 'com.android.support:design:31.1.0'
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation("com.google.android.material:material:1.6.0-alpha01")
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 }

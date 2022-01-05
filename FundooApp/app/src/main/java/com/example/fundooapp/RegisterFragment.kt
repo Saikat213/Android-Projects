@@ -25,7 +25,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         registerViewModel =
             ViewModelProvider(this, RegisterViewModelFactory(UserAuthService())).get(
                 RegisterViewModel::class.java
@@ -34,7 +33,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             requireActivity(),
             SharedViewModelFactory(UserAuthService())
         )[SharedViewModel::class.java]
-
         inputEmail = view.findViewById(R.id.register_emailID)
         inputPassword = view.findViewById(R.id.register_password)
         confirmPassword = view.findViewById(R.id.confirmPassword)
@@ -53,7 +51,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 confirmPassword = cnfPassword,
                 imageURL = ""
             )
-
             if (password.isEmpty() || password.length < 6)
                 inputPassword.setError("Enter valid password")
             else if (!password.equals(cnfPassword))
@@ -62,7 +59,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 registerViewModel.registerUser(user)
                 registerViewModel.registerStatus.observe(viewLifecycleOwner, Observer {
                     if (it.status) {
-                        Toast.makeText(requireContext(), "Registration Success", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Registration Success", Toast.LENGTH_SHORT)
+                            .show()
                         sharedViewModel.gotoLoginPage(true)
                     } else {
                         Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
