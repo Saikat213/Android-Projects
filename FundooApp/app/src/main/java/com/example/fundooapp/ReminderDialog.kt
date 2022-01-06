@@ -1,23 +1,17 @@
 package com.example.fundooapp
 
-import android.annotation.SuppressLint
 import android.app.*
 import android.content.DialogInterface
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
+import androidx.work.*
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import java.lang.System.currentTimeMillis
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -26,18 +20,11 @@ class ReminderDialog : DialogFragment() {
     lateinit var dateBtn: Button
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val workerData = mutableMapOf<String, Any>()
-        val bundle : Bundle
+        val bundle : Bundle = this.requireArguments()
         val builder = AlertDialog.Builder(requireContext())
         val view = layoutInflater.inflate(R.layout.reminder_layout, null)
         timeBtn = view.findViewById(R.id.pickTimeBtn)
         dateBtn = view.findViewById(R.id.pickDateBtn)
-
-        bundle = this.requireArguments()
-        if (bundle != null) {
-            workerData.put("Title", bundle.getString("Title")!!)
-            workerData.put("Content", bundle.getString("Content")!!)
-        }
 
         builder.setView(view)
         timeBtn.setOnClickListener {
@@ -46,17 +33,13 @@ class ReminderDialog : DialogFragment() {
         dateBtn.setOnClickListener {
             selectDate()
         }
-        val customTime = Calendar.getInstance().timeInMillis
-        val currentTime = currentTimeMillis()
-        val delay = customTime - currentTime
         builder.setPositiveButton("Save", object : DialogInterface.OnClickListener {
-            @SuppressLint("RestrictedApi")
-            val inputWorkerData = Data.Builder().putAll(workerData).build()
             override fun onClick(dialog: DialogInterface?, p1: Int) {
                 val request = OneTimeWorkRequestBuilder<MyWorker>().setInitialDelay(
                     2,
                     TimeUnit.MINUTES
-                ).setInputData(inputWorkerData).build()
+                ).setInputData(workDataOf("Title" to bundle.getString("Title"),
+                    "Content" to bundle.getString("Content"))).build()
                 WorkManager.getInstance(requireContext()).enqueue(request)
                 WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(request.id)
                     .observe(this@ReminderDialog, Observer<WorkInfo>() {
@@ -73,17 +56,7 @@ class ReminderDialog : DialogFragment() {
         return builder.create()
     }
 
-    fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Reminder_channel"
-            val description = "Channel for alarm manager"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel("Reminder", name, importance)
-            channel.description = description
-        }
-    }
-
-    fun selectTime() {
+    private fun selectTime() {
         var selectedTime: String = ""
         val timePicker =
             MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H).setHour(12)
@@ -109,7 +82,7 @@ class ReminderDialog : DialogFragment() {
         }
     }
 
-    fun selectDate() {
+    private fun selectDate() {
         val datePicker =
             MaterialDatePicker.Builder.datePicker().setTheme(R.style.DateThemeMaterial).build()
         datePicker.show(

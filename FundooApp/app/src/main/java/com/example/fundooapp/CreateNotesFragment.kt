@@ -10,12 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
     lateinit var notesTitle : EditText
@@ -53,6 +54,10 @@ class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
         toolbar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.label -> {
+                    val currentDate = LocalDate.now()
+                    val customDate = LocalDate.of(2022, 4, 12)
+                    val delayDate = ChronoUnit.DAYS.between(currentDate, customDate)
+                    Log.d("Date::---->", "$delayDate")
                     Toast.makeText(context, "Label Clicked", Toast.LENGTH_SHORT).show()
                 }
                 R.id.Reminder -> {

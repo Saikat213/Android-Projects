@@ -32,7 +32,7 @@
         android:title="Profile"
         android:id="@+id/UserProfile"
         app:showAsAction="always"
-        android:icon="@drawable/ic_account">
+        app:actionLayout="@layout/profile_pic_layout">
     </item>
 
 </menu>

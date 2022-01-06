@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import de.hdodenhof.circleimageview.CircleImageView
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var imageUri: Uri
@@ -36,31 +37,68 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: NoteAdapter
     lateinit var searchData: SearchView
-    lateinit var imageBtn : ImageView
+    lateinit var profileImage : ImageView
+    lateinit var profilePicture : CircleImageView
     lateinit var userEmailID : TextView
     lateinit var storageReference : StorageReference
     lateinit var dbReference : DatabaseReference
+    lateinit var progressBar : ProgressBar
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val context = requireContext()
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
+        recyclerView = view.findViewById(R.id.recyclerViewLayout)
+        var getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory(UserAuthService())
         )[SharedViewModel::class.java]
         fabButton = view.findViewById(R.id.FAV_addNote)
         bottomAppBar = view.findViewById(R.id.bottomAppBar)
-        recyclerView = view.findViewById(R.id.recyclerViewLayout)
+        profilePicture = activity?.findViewById(R.id.profilePic)!!
+        progressBar = view.findViewById(R.id.progressBar)
         searchData = activity?.findViewById(R.id.searchButton)!!
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        val getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
         adapter = NoteAdapter(getNotes, context)
         recyclerView.adapter = adapter
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+                    isScrolling = true
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val manager = GridLayoutManager(requireContext(), 2)
+                var currentItems = manager.childCount
+                var totalItems = manager.itemCount
+                var scrolledOutItems = manager.findFirstVisibleItemPosition()
+                if (isScrolling && (currentItems + scrolledOutItems == totalItems)) {
+                    isScrolling = false
+                    progressBar.visibility = View.VISIBLE
+                    getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
+                    adapter.notifyDataSetChanged()
+                    progressBar.visibility = View.GONE
+
+                }
+            }
+        })
         createNewNotes()
         appBarIcons(context, bottomAppBar)
         toolbarIcons(toolbar, recyclerView, context)
         filterData()
+        getUserProfilePicture(context)
+    }
+
+    private fun getUserProfilePicture(context: Context) {
+        storageReference = FirebaseStorage.getInstance().getReference("uploads")
+        NotesServiceImpl().retrieveUserProfilePicture(context, storageReference, profilePicture)
+        profilePicture.setOnClickListener {
+            Toast.makeText(context, "profile", Toast.LENGTH_SHORT).show()
+            profileDialog(context)
+        }
     }
 
     private fun appBarIcons(context: Context, bottomAppBar: BottomAppBar) {
@@ -82,7 +120,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                 R.id.GridView ->
                     recyclerView.layoutManager = GridLayoutManager(context, 2)
-                R.id.UserProfile -> profileDialog(context)
             }
             true
         }
@@ -118,21 +155,30 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         dbReference = FirebaseDatabase.getInstance().getReference("uploads")
         val builder = AlertDialog.Builder(context)
         val view = layoutInflater.inflate(R.layout.custom_dialog_layout, null)
-        imageBtn = view.findViewById(R.id.profileImage)
+        profileImage = view.findViewById(R.id.profileImage)
         userEmailID = view.findViewById(R.id.profileEmailID)
         userEmailID.text = uid.email.toString()
+        NotesServiceImpl().retrieveUserProfilePicture(context, storageReference, profileImage)
         builder.setView(view)
-        NotesServiceImpl().retrieveUserProfilePicture(context, storageReference, imageBtn)
-        imageBtn.setOnClickListener {
+        profileImage.setOnClickListener {
             chooseImageFile()
         }
-        builder.setMessage("Profile").setPositiveButton("SignOut", DialogInterface.OnClickListener { dialog, id ->
-            firebaseAuth.signOut()
-            startActivity(Intent(context, MainActivity::class.java))
-        }).setNegativeButton("Change Profile Picture", DialogInterface.OnClickListener { dialog, id ->
-            storageReference.child("image/${uid.uid}.jpg").delete()
-            NotesServiceImpl().uploadUserProfilePicture(context, storageReference, dbReference, imageUri)
-        })
+        builder.setMessage("Profile")
+            .setPositiveButton("SignOut", DialogInterface.OnClickListener { dialog, id ->
+                firebaseAuth.signOut()
+                startActivity(Intent(context, MainActivity::class.java))
+            }).setNegativeButton(
+            "Change Profile Picture",
+            DialogInterface.OnClickListener { dialog, id ->
+                storageReference.child("image/${uid.uid}.jpg").delete()
+                NotesServiceImpl().uploadUserProfilePicture(
+                    context,
+                    storageReference,
+                    dbReference,
+                    imageUri
+                )
+                NotesServiceImpl().retrieveUserProfilePicture(context, storageReference, profilePicture)
+            })
         builder.create().show()
     }
 
@@ -148,11 +194,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         if (requestCode == image_request && resultCode == RESULT_OK && data != null && data.data != null) {
             imageUri = data.data!!
-            imageBtn.setImageURI(imageUri)
+            profileImage.setImageURI(imageUri)
         }
     }
 
     companion object {
-      private const val image_request = 1
+        private const val image_request = 1
+        private const val pageLimit = 10
+        private var isScrolling : Boolean = false
     }
 }

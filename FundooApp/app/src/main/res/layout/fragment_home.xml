@@ -32,13 +32,21 @@
         app:tint="@color/white"
         app:maxImageSize="35dp" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLayout"
-        android:layout_width="394dp"
-        android:layout_height="520dp"
+        android:layout_width="392dp"
+        android:layout_height="475dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="70dp" />
+        android:layout_marginTop="85dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
