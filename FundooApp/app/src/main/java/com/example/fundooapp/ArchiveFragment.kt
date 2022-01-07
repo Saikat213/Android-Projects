@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundooapp.model.NotesData
+import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -18,9 +19,8 @@ class ArchiveFragment : Fragment(R.layout.fragment_archive) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        archiveRecyclerView = view.findViewById(R.id.archiveRecyclerView)
         val context = requireContext()
+        archiveRecyclerView = view.findViewById(R.id.archiveRecyclerView)
         archiveRecyclerView.layoutManager = GridLayoutManager(context, 2)
         retriveArchiveNotes(context)
     }
@@ -31,29 +31,43 @@ class ArchiveFragment : Fragment(R.layout.fragment_archive) {
     }
 
     fun retriveArchiveNotes(context: Context) {
-        var documentReference = FirebaseFirestore.getInstance()
-        var userID = FirebaseAuth.getInstance().currentUser!!.uid
         var archiveNotes = ArrayList<NotesData>()
         var myAdapter = NoteAdapter(archiveNotes, context)
-        documentReference.collection("notes").document(userID).collection("My notes")
-            .whereEqualTo("Archive", "true")
-            .addSnapshotListener(object : EventListener<QuerySnapshot> {
-                override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
-                    if (error != null) {
-                        Log.d("Firebase error: ", error.message.toString())
-                        return
-                    }
-                    for (documents: DocumentChange in value?.documentChanges!!) {
-                        if (documents.type == DocumentChange.Type.ADDED) {
-                            val data = documents.document.toObject(NotesData::class.java)
-                            data.ID = documents.document.id
-                            Log.d("Firestore Data: ", documents.document.toString())
-                            archiveNotes.add(data)
+        if (NotesServiceImpl().isOnline(context)) {
+            val documentReference = FirebaseFirestore.getInstance()
+            val userID = FirebaseAuth.getInstance().currentUser!!.uid
+            documentReference.collection("notes").document(userID).collection("My notes")
+                .whereEqualTo("Archive", "true")
+                .addSnapshotListener(object : EventListener<QuerySnapshot> {
+                    override fun onEvent(
+                        value: QuerySnapshot?,
+                        error: FirebaseFirestoreException?
+                    ) {
+                        if (error != null) {
+                            Log.d("Firebase error: ", error.message.toString())
+                            return
                         }
+                        for (documents: DocumentChange in value?.documentChanges!!) {
+                            if (documents.type == DocumentChange.Type.ADDED) {
+                                val data = documents.document.toObject(NotesData::class.java)
+                                data.ID = documents.document.id
+                                Log.d("Firestore Data: ", documents.document.toString())
+                                archiveNotes.add(data)
+                            }
+                        }
+                        myAdapter.notifyDataSetChanged()
+                        archiveRecyclerView.adapter = NoteAdapter(archiveNotes, context)
                     }
-                    myAdapter.notifyDataSetChanged()
-                    archiveRecyclerView.adapter = NoteAdapter(archiveNotes, context)
-                }
-            })
+                })
+        } else {
+            val db = DatabaseHandler(context)
+            val archiveData = db.retriveData("true")
+            while (archiveData.moveToNext()) {
+                archiveNotes.add(NotesData(archiveData.getString(1), archiveData.getString(2),
+                                    archiveData.getString(3)))
+            }
+            myAdapter.notifyDataSetChanged()
+            archiveRecyclerView.adapter = NoteAdapter(archiveNotes, context)
+        }
     }
 }

@@ -2,12 +2,12 @@ package com.example.fundooapp
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.example.fundooapp.model.NotesData
 
 class DatabaseHandler(context : Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-    private val db : SQLiteDatabase = this.writableDatabase
+    private val database : SQLiteDatabase = this.writableDatabase
 
     override fun onCreate(db: SQLiteDatabase?) {
         val createQuery = "create table $TABLE_NAME($ID INTEGER primary key autoincrement, $TITLE TEXT, $CONTENT TEXT, $ARCHIVED TEXT)"
@@ -20,26 +20,36 @@ class DatabaseHandler(context : Context) : SQLiteOpenHelper(context, DATABASE_NA
         onCreate(db)
     }
 
-    fun saveData(noteData : NotesData) {
+    fun saveData(title: String, noteContent : String, archive : String) {
         val content = ContentValues()
-        content.put(FIRESTOREID, noteData.ID)
-        content.put(TITLE, noteData.Title)
-        content.put(CONTENT, noteData.Content)
-        content.put(ARCHIVED, noteData.Archive)
-        db.insert(TABLE_NAME, null, content)
-        db.close()
-    }
-
-    fun deleteData(id : String) {
-        db.delete(TABLE_NAME, "ID = ?", arrayOf(id))
-    }
-
-    fun updateData(title: String, noteContent: String, id: String) {
-        val content = ContentValues()
-        content.put(FIRESTOREID, id)
         content.put(TITLE, title)
         content.put(CONTENT, noteContent)
-        db.update(TABLE_NAME, content, "ID = ?", arrayOf(id))
+        content.put(ARCHIVED, archive)
+        database.insert(TABLE_NAME, null, content)
+        database.close()
+    }
+
+    fun deleteData(title : String) {
+        database.delete(TABLE_NAME, "TITLE = ?", arrayOf(title))
+    }
+
+    fun updateData(title: String, noteContent: String, searchData : String) {
+        val content = ContentValues()
+        content.put(TITLE, title)
+        content.put(CONTENT, noteContent)
+        database.update(TABLE_NAME, content, "TITLE = ?", arrayOf(searchData))
+    }
+
+    fun updateArchive(title: String) {
+        val content = ContentValues()
+        content.put(ARCHIVED, "true")
+        database.update(TABLE_NAME, content, "TITLE = ?", arrayOf(title))
+    }
+
+    fun retriveData(archive : String) : Cursor {
+        val readDataDB = this.readableDatabase
+        val getDataQuery = "SELECT * FROM $TABLE_NAME WHERE ARCHIVED = '$archive'"
+        return readDataDB.rawQuery(getDataQuery, null)
     }
 
     companion object {

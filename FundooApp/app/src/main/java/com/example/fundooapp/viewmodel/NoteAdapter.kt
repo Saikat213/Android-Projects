@@ -52,7 +52,8 @@ class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) : Rec
                 when(it.itemId) {
                     R.id.delete -> {
                         dataSet.removeAt(position)
-                        NotesServiceImpl().deleteNotes(notes?.ID!!, context)
+                        Log.d("ID-->${notes.ID}", "Title--->${notes.Title}")
+                        NotesServiceImpl().deleteNotes(notes.ID, notes?.Title!!, context)
                     }
 
                     R.id.edit -> {
@@ -74,7 +75,7 @@ class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) : Rec
                     R.id.archive -> {
                         dataSet[position].Archive = "true"
                         dataSet.removeAt(position)
-                        UpdateFragment().updateArchiveFieldFirestore(notes.ID)
+                        UpdateFragment().updateArchiveField(notes.ID, notes.Title, context)
                     }
                 }
                 notifyDataSetChanged()

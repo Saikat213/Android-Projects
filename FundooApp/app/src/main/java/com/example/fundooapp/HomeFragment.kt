@@ -49,7 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val context = requireContext()
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
         recyclerView = view.findViewById(R.id.recyclerViewLayout)
-        var getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
+        var getNotes = NotesServiceImpl().getUserNotes(context, recyclerView)
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory(UserAuthService())
@@ -78,7 +78,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 if (isScrolling && (currentItems + scrolledOutItems == totalItems)) {
                     isScrolling = false
                     progressBar.visibility = View.VISIBLE
-                    getNotes = NotesServiceImpl().getDataFromFirestore(context, recyclerView)
+                    getNotes = NotesServiceImpl().getUserNotes(context, recyclerView)
                     adapter.notifyDataSetChanged()
                     progressBar.visibility = View.GONE
 

@@ -1,16 +1,14 @@
 package com.example.fundooapp
 
-import android.content.ContentValues
 import android.content.Context
-import android.nfc.Tag
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
@@ -26,7 +24,6 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val context = requireContext()
         var bundle: Bundle
         updateTitle = view.findViewById(R.id.updateTitle)
@@ -41,7 +38,7 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
         if (bundle != null) {
             updateTitle.setText(bundle.getString("Title"))
             updateContent.setText(bundle.getString("Content"))
-            updateNotes(bundle.getString("ID"), context)
+            updateNotes(bundle.getString("ID"), bundle.getString("Title"), context)
         }
     }
 
@@ -55,38 +52,49 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
         (activity as AppCompatActivity?)!!.supportActionBar!!.show()
     }
 
-    fun updateNotes(id: String?, context: Context) {
+    fun updateNotes(id: String?, searchData : String?, context: Context) {
+        val database = DatabaseHandler(context)
         updateFab.setOnClickListener {
             val newTitle = updateTitle.text.toString()
             val newContent = updateContent.text.toString()
-            val fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
-            Log.d("ID: ", id!!)
-            val userID = FirebaseAuth.getInstance().currentUser!!.uid
-            var documentReference =
-                fstore.collection("notes").document(userID).collection("My notes").document(id!!)
-            val database = DatabaseHandler(context)
-            documentReference.update("Title", newTitle)
-            documentReference.update("Content", newContent)
-                .addOnSuccessListener {
-                    //db.updateData(newTitle, newContent, id)
-                    sharedViewModel.gotoHomePage(true)
-                }.addOnFailureListener {
-                    Log.d(ContentValues.TAG, "Update failed")
-                    Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show()
-                }
+            if (NotesServiceImpl().isOnline(context)) {
+                val fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
+                val userID = FirebaseAuth.getInstance().currentUser!!.uid
+                val documentReference =
+                    fstore.collection("notes").document(userID).collection("My notes")
+                        .document(id!!)
+                documentReference.update("Title", newTitle)
+                documentReference.update("Content", newContent)
+                    .addOnSuccessListener {
+                        database.updateData(newTitle, newContent, searchData!!)
+                        Toast.makeText(context, "Update Success", Toast.LENGTH_SHORT).show()
+                        sharedViewModel.gotoHomePage(true)
+                    }.addOnFailureListener {
+                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                database.updateData(newTitle, newContent, searchData!!)
+                Toast.makeText(context, "Update Success", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    fun updateArchiveFieldFirestore(id: String?) {
-        val fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
-        val userID = FirebaseAuth.getInstance().currentUser!!.uid
-
-        var documentReference =
-            fstore.collection("notes").document(userID).collection("My notes").document(id!!)
-        documentReference.update("Archive", "true").addOnSuccessListener {
-            Log.d(tag, "Archived")
-        }.addOnFailureListener {
-            Log.d(tag, "Error: $it")
+    fun updateArchiveField(id: String?, title : String?, context: Context) {
+        val database = DatabaseHandler(context)
+        if (NotesServiceImpl().isOnline(context)) {
+            val fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
+            val userID = FirebaseAuth.getInstance().currentUser!!.uid
+            val documentReference =
+                fstore.collection("notes").document(userID).collection("My notes").document(id!!)
+            documentReference.update("Archive", "true").addOnSuccessListener {
+                database.updateArchive(title!!)
+                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener {
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            database.updateArchive(title!!)
+            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.fundooapp.model
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
@@ -22,61 +24,82 @@ class NotesServiceImpl {
     val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     val userID = firebaseAuth.currentUser!!.uid
 
-    fun getDataFromFirestore(context: Context, recyclerView: RecyclerView): ArrayList<NotesData> {
-        val documentReference = FirebaseFirestore.getInstance()
+    fun getUserNotes(context: Context, recyclerView: RecyclerView): ArrayList<NotesData> {
         var userNotes = ArrayList<NotesData>()
         val myAdapter = NoteAdapter(userNotes, context)
-        documentReference.collection("notes").document(userID).collection("My notes")
-            .whereEqualTo("Archive", "false")
-            .addSnapshotListener(object : EventListener<QuerySnapshot> {
-                override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
-                    if (error != null) {
-                        Log.d("Firebase error: ", error.message.toString())
-                        return
-                    }
-                    for (documents: DocumentChange in value?.documentChanges!!) {
-                        if (documents.type == DocumentChange.Type.ADDED) {
-                            val data = documents.document.toObject(NotesData::class.java)
-                            data.ID = documents.document.id
-                            Log.d("Firestore Data: ", documents.document.toString())
-                            userNotes.add(data)
+        if (isOnline(context)) {
+            val documentReference = FirebaseFirestore.getInstance()
+            documentReference.collection("notes").document(userID).collection("My notes")
+                .whereEqualTo("Archive", "false")
+                .addSnapshotListener(object : EventListener<QuerySnapshot> {
+                    override fun onEvent(
+                        value: QuerySnapshot?,
+                        error: FirebaseFirestoreException?
+                    ) {
+                        if (error != null) {
+                            Log.d("Firebase error: ", error.message.toString())
+                            return
                         }
+                        for (documents: DocumentChange in value?.documentChanges!!) {
+                            if (documents.type == DocumentChange.Type.ADDED) {
+                                val data = documents.document.toObject(NotesData::class.java)
+                                data.ID = documents.document.id
+                                userNotes.add(data)
+                            }
+                        }
+                        myAdapter.notifyDataSetChanged()
+                        recyclerView.adapter = NoteAdapter(userNotes, context)
                     }
-                    myAdapter.notifyDataSetChanged()
-                    recyclerView.adapter = NoteAdapter(userNotes, context)
-                }
-            })
+                })
+        } else {
+            val db = DatabaseHandler(context)
+            val data = db.retriveData("false")
+            while (data.moveToNext()) {
+                userNotes.add(NotesData(data.getString(1), data.getString(2), data.getString(3)))
+            }
+            myAdapter.notifyDataSetChanged()
+            recyclerView.adapter = NoteAdapter(userNotes, context)
+        }
         return userNotes
     }
 
-    fun saveDataToFirestore(title: String, content: String, context: Context) {
-        val fstore = FirebaseFirestore.getInstance()
+    fun saveNotes(title: String, content: String, context: Context) {
         val database = DatabaseHandler(context)
-        val documentReference =
-            fstore.collection("notes").document(userID).collection("My notes").document()
-
-        val note = mutableMapOf<String, String>()
-        note.put("Title", title)
-        note.put("Content", content)
-        note.put("Archive", "false")
-        documentReference.set(note).addOnSuccessListener {
-            //database.saveData(NotesData(title, content, "", false))
-            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-        }.addOnFailureListener {
-            Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show()
+        if (isOnline(context)) {
+            val fstore = FirebaseFirestore.getInstance()
+            val documentReference =
+                fstore.collection("notes").document(userID).collection("My notes").document()
+            val note = mutableMapOf<String, String>()
+            note.put("Title", title)
+            note.put("Content", content)
+            note.put("Archive", "false")
+            documentReference.set(note).addOnSuccessListener {
+                database.saveData(title, content, "false")
+                Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener {
+                Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            database.saveData(title, content, "false")
         }
     }
 
-    fun deleteNotes(id: String, context: Context) {
-        val firebaseStore = FirebaseFirestore.getInstance()
+    fun deleteNotes(id: String?, title: String, context: Context) {
         val database = DatabaseHandler(context)
-        firebaseStore.collection("notes").document(userID).collection("My notes").document(id)
-            .delete().addOnSuccessListener {
-                //database.deleteData(id)
-            }.addOnFailureListener {
-                Log.d("Deletion error: ", "$it")
-                Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
-            }
+        if (isOnline(context)) {
+            val firebaseStore = FirebaseFirestore.getInstance()
+            firebaseStore.collection("notes").document(userID).collection("My notes").document(id!!)
+                .delete().addOnSuccessListener {
+                    database.deleteData(title)
+                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+                    Log.d("Deletion error: ", "$it")
+                    Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            database.deleteData(title)
+            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun uploadUserProfilePicture(
@@ -86,7 +109,6 @@ class NotesServiceImpl {
         imageUri: Uri
     ) {
         if (imageUri != null) {
-            //addUserDetails(imageUri, context)
             val fileReference: StorageReference =
                 storageReference.child("image/${userID}.jpg")
             fileReference.putFile(imageUri).addOnSuccessListener {
@@ -126,5 +148,24 @@ class NotesServiceImpl {
         }.addOnFailureListener {
             Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    Log.i("Internet----->>>>", "${NetworkCapabilities.TRANSPORT_CELLULAR}")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
+                    Log.d("Wifi---->>>>", "${NetworkCapabilities.TRANSPORT_WIFI}")
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
