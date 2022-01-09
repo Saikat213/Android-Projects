@@ -7,6 +7,11 @@
         android:icon="@drawable/notes_asset"/>
 
     <item
+        android:title="Label"
+        android:id="@+id/label"
+        android:icon="@drawable/ic_label"/>
+
+    <item
         android:title="Archive"
         android:id="@+id/archive"
         android:icon="@drawable/archive_asset">

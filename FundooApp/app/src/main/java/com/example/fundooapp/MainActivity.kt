@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -18,11 +19,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
+import com.example.fundooapp.network.ApiClient
+import com.example.fundooapp.network.ApiInterface
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
@@ -48,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toggle.isDrawerIndicatorEnabled = true
         sharedViewModel.gotoLoginPage(true)
+        //retrofitServices(this)
         observeAppNav()
         onNavigationItemSelected(drawer, navView, this)
     }
@@ -127,5 +134,23 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+    }
+
+    fun retrofitServices(context: Context) {
+        val retrofit = ApiClient.getApiClient()
+        val api = retrofit.create(ApiInterface::class.java)
+        api.fetchAllData().enqueue(object : Callback<List<NotesData>> {
+            override fun onResponse(
+                call: Call<List<NotesData>>,
+                response: Response<List<NotesData>>
+            ) {
+                Log.d("Retrofit-->", "${response.body()}")
+                sharedViewModel.gotoHomePage(true)
+            }
+
+            override fun onFailure(call: Call<List<NotesData>>, t: Throwable) {
+                Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

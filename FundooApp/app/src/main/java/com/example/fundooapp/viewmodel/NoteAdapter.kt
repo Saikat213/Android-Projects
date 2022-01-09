@@ -16,14 +16,16 @@ import com.example.fundooapp.model.NotesServiceImpl
 import java.util.*
 import kotlin.collections.ArrayList
 
-class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) : RecyclerView.Adapter<NoteAdapter.RecyclerViewHolder>(), Filterable {
-    val originalList : ArrayList<NotesData> = dataSet
+class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) :
+    RecyclerView.Adapter<NoteAdapter.RecyclerViewHolder>(), Filterable {
+    var isLoaderVisible = false
+    val originalList: ArrayList<NotesData> = dataSet
     var filteredList = ArrayList<NotesData>()
 
     inner class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var displayDataTitle : TextView
-        var displayDataContent : TextView
-        var imgButton : ImageView
+        var displayDataTitle: TextView
+        var displayDataContent: TextView
+        var imgButton: ImageView
 
         init {
             displayDataTitle = itemView.findViewById(R.id.tvtitle)
@@ -31,25 +33,26 @@ class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) : Rec
             imgButton = itemView.findViewById(R.id.notesMenu)
         }
 
-        fun bindData(userData : NotesData) {
+        fun bindData(userData: NotesData) {
             displayDataTitle.text = userData.Title
             displayDataContent.text = userData.Content
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_layout, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.recycler_layout, parent, false)
         return RecyclerViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        var notes : NotesData = dataSet[position]
+        var notes: NotesData = dataSet[position]
         holder.bindData(notes)
-        holder.imgButton.setOnClickListener {v ->
+        holder.imgButton.setOnClickListener { v ->
             val popupMenu = PopupMenu(v.context, holder.imgButton)
             popupMenu.menuInflater.inflate(R.menu.notes_options_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {
-                when(it.itemId) {
+                when (it.itemId) {
                     R.id.delete -> {
                         dataSet.removeAt(position)
                         Log.d("ID-->${notes.ID}", "Title--->${notes.Title}")
@@ -96,12 +99,16 @@ class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) : Rec
                 if (charSearch.isEmpty()) {
                     filteredList.clear()
                     filteredList = originalList
-                }
-                else {
+                } else {
                     val resultList = ArrayList<NotesData>()
                     for (data in dataSet) {
-                        if (data.Title!!.lowercase(Locale.getDefault()).contains(charSearch.lowercase(Locale.getDefault())))
-                            resultList.add(data)
+                        if (data.Title != null && data.Content != null) {
+                            if (data.Title!!.lowercase(Locale.getDefault())
+                                    .contains(charSearch.lowercase(Locale.getDefault())) || data.Content!!.lowercase(
+                                    Locale.getDefault()).contains(charSearch.lowercase(Locale.getDefault()))
+                            )
+                                resultList.add(data)
+                        }
                     }
                     filteredList = resultList
                 }
@@ -110,12 +117,42 @@ class NoteAdapter(var dataSet: ArrayList<NotesData>, val context: Context) : Rec
                 return filterResult
             }
 
-            override fun publishResults(text: CharSequence?, results: FilterResults?) {
+            override fun publishResults(text: CharSequence?, results: FilterResults) {
                 filteredList = results!!.values as ArrayList<NotesData>
                 Log.d("FilteredList Size: ${filteredList.size}", "$filteredList")
                 dataSet = filteredList
                 Log.d("UpdatedList Size: ${dataSet.size}", "$dataSet")
             }
         }
+    }
+
+    fun addItems(notes : ArrayList<NotesData>) {
+        dataSet.addAll(notes)
+        notifyDataSetChanged()
+    }
+
+    fun addLoading() {
+        isLoaderVisible = true
+        dataSet.add(NotesData())
+        notifyItemInserted(dataSet.size - 1)
+    }
+
+    fun removeLoading() {
+        isLoaderVisible = false
+        val position = dataSet.size - 1
+        var items : NotesData = getItem(position)
+        if (items != null) {
+            dataSet.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun clearList() {
+        dataSet.clear()
+        notifyDataSetChanged()
+    }
+
+    fun getItem(position : Int) : NotesData {
+        return dataSet.get(position)
     }
 }

@@ -3,26 +3,36 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/delete_asset.xml" value="0.20925925925925926" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/email_vector.xml" value="0.20925925925925926" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/fab_button.xml" value="0.21388888888888888" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/floating_action_button.xml" value="0.21388888888888888" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/ic_baseline_security_24.xml" value="0.20925925925925926" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/ic_baseline_update_24.xml" value="0.21388888888888888" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/ic_done.xml" value="0.20925925925925926" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/ic_label.xml" value="0.20925925925925926" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/ic_menu.xml" value="0.21388888888888888" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/ic_options.xml" value="0.21388888888888888" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/drawable/input_background.xml" value="0.8714285714285714" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/activity_home.xml" value="0.22" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/add_label.xml" value="0.18" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/custom_dialog_layout.xml" value="0.22" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/custom_toolbar.xml" value="0.22" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/drawer_menu.xml" value="0.11730072463768115" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/expand_label.xml" value="0.2" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_archive.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_create_notes.xml" value="0.1" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_home.xml" value="0.18" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_home_page.xml" value="0.22" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_label.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_login.xml" value="0.12364130434782608" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_notes.xml" value="0.22" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_register.xml" value="0.22" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_search.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_test.xml" value="0.12364130434782608" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/fragment_update.xml" value="0.1" />
+        <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/group_item.xml" value="0.22" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/nav_header.xml" value="0.22" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/profile_pic_layout.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Saikat Sen/Desktop/AS Projects/FundooApp/app/src/main/res/layout/recycler_layout.xml" value="0.20416666666666666" />

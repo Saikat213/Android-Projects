@@ -36,13 +36,10 @@ class ReminderDialog : DialogFragment(), DatePickerDialog.OnDateSetListener, Tim
         }
         builder.setPositiveButton("Save", object : DialogInterface.OnClickListener {
             override fun onClick(dialog: DialogInterface?, p1: Int) {
-                val calender = Calendar.getInstance()
-                calender.set(year, month, day, hour, minute)
-                val today = Calendar.getInstance()
-                val delay = (calender.timeInMillis/1000L) - (today.timeInMillis/1000L)
-                Log.d("Delay---->>>", "$delay")
-                val request = OneTimeWorkRequestBuilder<MyWorker>().setInitialDelay(delay,
-                    TimeUnit.SECONDS
+                val delay = calculateTimeDifference(hour, minute)
+                Log.d("Delay--->", "$delay")
+                val request = OneTimeWorkRequestBuilder<MyWorker>().setInitialDelay(2,
+                    TimeUnit.MINUTES
                 ).setInputData(workDataOf("Title" to bundle.getString("Title"),
                     "Content" to bundle.getString("Content"))).build()
                 WorkManager.getInstance(requireContext()).enqueue(request)
@@ -61,48 +58,28 @@ class ReminderDialog : DialogFragment(), DatePickerDialog.OnDateSetListener, Tim
         return builder.create()
     }
 
+    private fun calculateTimeDifference(hour: Int, minute: Int) : Long {
+        val today = Calendar.getInstance()
+        var today_hr = today.get(Calendar.HOUR_OF_DAY)
+        var today_min = today.get(Calendar.MINUTE)
+        if (minute > today_min) {
+            --today_hr
+            today_min +=60
+        }
+        val differenceInHour = hour - today_hr
+        val differenceInMinute = minute - today_min
+        return (differenceInHour + differenceInMinute).toLong()
+    }
+
     private fun selectTime() {
-        /*var selectedTime: String = ""
-        val timePicker =
-            MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H).setHour(12)
-                .setMinute(0).setTitleText("Select Time").setTheme(R.style.AppThemeMaterial).build()
-        timePicker.show(
-            (activity as AppCompatActivity?)!!.supportFragmentManager,
-            timePicker.toString()
-        )
-        timePicker.addOnPositiveButtonClickListener {
-            if (timePicker.hour >= 12) {
-                selectedTime = String.format("%02d", timePicker.hour - 12) + ":" + String.format(
-                    "%02d",
-                    timePicker.minute
-                ) + "PM"
-            } else {
-                selectedTime = String.format("%02d", timePicker.hour) + ":" + String.format(
-                    "%02d",
-                    timePicker.minute
-                ) + "AM"
-            }
-            timeBtn.text = selectedTime
-            Log.d("Selected Time: ", selectedTime)
-        }*/
         val calender = Calendar.getInstance()
         val hr = calender.get(Calendar.HOUR_OF_DAY)
         val min = calender.get(Calendar.MINUTE)
-        TimePickerDialog(requireContext(), this, hr, min, android.text.format.DateFormat.is24HourFormat(requireContext())).show()
+        TimePickerDialog(requireContext(), this, hr, min,
+            android.text.format.DateFormat.is24HourFormat(requireContext())).show()
     }
 
     private fun selectDate() {
-        /*val datePicker =
-            MaterialDatePicker.Builder.datePicker().setTheme(R.style.DateThemeMaterial).build()
-        datePicker.show(
-            (activity as AppCompatActivity?)!!.supportFragmentManager,
-            datePicker.toString()
-        )
-        datePicker.addOnPositiveButtonClickListener {
-            dateBtn.text = datePicker.headerText
-
-            Log.d("Selected Date: ", datePicker.headerText)
-        }*/
         val calender = Calendar.getInstance()
         val yr = calender.get(Calendar.YEAR)
         val monthOfYr = calender.get(Calendar.MONTH)
@@ -119,7 +96,6 @@ class ReminderDialog : DialogFragment(), DatePickerDialog.OnDateSetListener, Tim
             this.month = months + 1
             this.day = days
         }
-        Log.d("Month-->${this.month}", "Day--->${this.day}")
     }
 
     override fun onTimeSet(p0: TimePicker?, hourOfDay: Int, minuteOfDay: Int) {

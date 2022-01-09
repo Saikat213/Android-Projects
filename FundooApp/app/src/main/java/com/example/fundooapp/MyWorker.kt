@@ -18,7 +18,7 @@ class MyWorker(context: Context, workerParams : WorkerParameters) : Worker(conte
         return Result.success()
     }
 
-    fun scheduleNotifications(title : String, description : String) {
+    private fun scheduleNotifications(title : String, description : String) {
         val notificationManager : NotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel : NotificationChannel = NotificationChannel("Reminder", "Notes", NotificationManager.IMPORTANCE_HIGH)

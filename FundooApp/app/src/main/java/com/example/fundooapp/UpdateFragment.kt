@@ -61,7 +61,7 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
                 val fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
                 val userID = FirebaseAuth.getInstance().currentUser!!.uid
                 val documentReference =
-                    fstore.collection("notes").document(userID).collection("My notes")
+                    fstore.collection("Users").document(userID).collection("notes")
                         .document(id!!)
                 documentReference.update("Title", newTitle)
                 documentReference.update("Content", newContent)
@@ -85,7 +85,7 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
             val fstore: FirebaseFirestore = FirebaseFirestore.getInstance()
             val userID = FirebaseAuth.getInstance().currentUser!!.uid
             val documentReference =
-                fstore.collection("notes").document(userID).collection("My notes").document(id!!)
+                fstore.collection("Users").document(userID).collection("notes").document(id!!)
             documentReference.update("Archive", "true").addOnSuccessListener {
                 database.updateArchive(title!!)
                 Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()

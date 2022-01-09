@@ -27,9 +27,10 @@ class NotesServiceImpl {
     fun getUserNotes(context: Context, recyclerView: RecyclerView): ArrayList<NotesData> {
         var userNotes = ArrayList<NotesData>()
         val myAdapter = NoteAdapter(userNotes, context)
+        val db = DatabaseHandler(context)
         if (isOnline(context)) {
             val documentReference = FirebaseFirestore.getInstance()
-            documentReference.collection("notes").document(userID).collection("My notes")
+            documentReference.collection("Users").document(userID).collection("notes")
                 .whereEqualTo("Archive", "false")
                 .addSnapshotListener(object : EventListener<QuerySnapshot> {
                     override fun onEvent(
@@ -52,7 +53,6 @@ class NotesServiceImpl {
                     }
                 })
         } else {
-            val db = DatabaseHandler(context)
             val data = db.retriveData("false")
             while (data.moveToNext()) {
                 userNotes.add(NotesData(data.getString(1), data.getString(2), data.getString(3)))
@@ -68,7 +68,7 @@ class NotesServiceImpl {
         if (isOnline(context)) {
             val fstore = FirebaseFirestore.getInstance()
             val documentReference =
-                fstore.collection("notes").document(userID).collection("My notes").document()
+                fstore.collection("Users").document(userID).collection("notes").document()
             val note = mutableMapOf<String, String>()
             note.put("Title", title)
             note.put("Content", content)
@@ -88,13 +88,12 @@ class NotesServiceImpl {
         val database = DatabaseHandler(context)
         if (isOnline(context)) {
             val firebaseStore = FirebaseFirestore.getInstance()
-            firebaseStore.collection("notes").document(userID).collection("My notes").document(id!!)
+            firebaseStore.collection("Users").document(userID).collection("notes").document(id!!)
                 .delete().addOnSuccessListener {
                     database.deleteData(title)
                     Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
                 }.addOnFailureListener {
-                    Log.d("Deletion error: ", "$it")
-                    Toast.makeText(context, "Deletion failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                 }
         } else {
             database.deleteData(title)
@@ -158,10 +157,8 @@ class NotesServiceImpl {
                 connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
             if (capabilities != null) {
                 if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    Log.i("Internet----->>>>", "${NetworkCapabilities.TRANSPORT_CELLULAR}")
                     return true
                 } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
-                    Log.d("Wifi---->>>>", "${NetworkCapabilities.TRANSPORT_WIFI}")
                     return true
                 }
             }

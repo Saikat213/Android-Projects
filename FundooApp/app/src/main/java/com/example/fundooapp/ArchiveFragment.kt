@@ -5,14 +5,21 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.NotesServiceImpl
+import com.example.fundooapp.network.ApiClient
+import com.example.fundooapp.network.ApiInterface
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ArchiveFragment : Fragment(R.layout.fragment_archive) {
     lateinit var archiveRecyclerView: RecyclerView
@@ -31,12 +38,13 @@ class ArchiveFragment : Fragment(R.layout.fragment_archive) {
     }
 
     fun retriveArchiveNotes(context: Context) {
-        var archiveNotes = ArrayList<NotesData>()
-        var myAdapter = NoteAdapter(archiveNotes, context)
+        val archiveNotes = ArrayList<NotesData>()
+        val myAdapter = NoteAdapter(archiveNotes, context)
+        val db = DatabaseHandler(context)
         if (NotesServiceImpl().isOnline(context)) {
             val documentReference = FirebaseFirestore.getInstance()
             val userID = FirebaseAuth.getInstance().currentUser!!.uid
-            documentReference.collection("notes").document(userID).collection("My notes")
+            documentReference.collection("Users").document(userID).collection("notes")
                 .whereEqualTo("Archive", "true")
                 .addSnapshotListener(object : EventListener<QuerySnapshot> {
                     override fun onEvent(
@@ -51,7 +59,6 @@ class ArchiveFragment : Fragment(R.layout.fragment_archive) {
                             if (documents.type == DocumentChange.Type.ADDED) {
                                 val data = documents.document.toObject(NotesData::class.java)
                                 data.ID = documents.document.id
-                                Log.d("Firestore Data: ", documents.document.toString())
                                 archiveNotes.add(data)
                             }
                         }
@@ -60,7 +67,6 @@ class ArchiveFragment : Fragment(R.layout.fragment_archive) {
                     }
                 })
         } else {
-            val db = DatabaseHandler(context)
             val archiveData = db.retriveData("true")
             while (archiveData.moveToNext()) {
                 archiveNotes.add(NotesData(archiveData.getString(1), archiveData.getString(2),

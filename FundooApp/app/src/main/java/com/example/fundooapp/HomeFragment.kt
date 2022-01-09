@@ -7,16 +7,24 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.fundooapp.Pagination.Companion.PAGE_START
+import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
+import com.example.fundooapp.network.ApiInterface
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
@@ -28,8 +36,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.Runnable
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment(R.layout.fragment_home), SwipeRefreshLayout.OnRefreshListener {
     lateinit var imageUri: Uri
     lateinit var fabButton: FloatingActionButton
     lateinit var bottomAppBar : BottomAppBar
@@ -43,13 +55,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var storageReference : StorageReference
     lateinit var dbReference : DatabaseReference
     lateinit var progressBar : ProgressBar
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    lateinit var expandableListView: ExpandableListView
+    var getNotes: ArrayList<NotesData>? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val context = requireContext()
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.customToolbar)
         recyclerView = view.findViewById(R.id.recyclerViewLayout)
-        var getNotes = NotesServiceImpl().getUserNotes(context, recyclerView)
+        getNotes = NotesServiceImpl().getUserNotes(context, recyclerView)
         sharedViewModel = ViewModelProvider(
             requireActivity(),
             SharedViewModelFactory(UserAuthService())
@@ -58,31 +73,27 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         bottomAppBar = view.findViewById(R.id.bottomAppBar)
         profilePicture = activity?.findViewById(R.id.profilePic)!!
         progressBar = view.findViewById(R.id.progressBar)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh)
         searchData = activity?.findViewById(R.id.searchButton)!!
+       // expandableListView = view.findViewById(R.id.expandableList)
+        swipeRefreshLayout.setOnRefreshListener(this)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        adapter = NoteAdapter(getNotes, context)
+        adapter = NoteAdapter(ArrayList<NotesData>(), context)
         recyclerView.adapter = adapter
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
-                    isScrolling = true
+        doApiCall(getNotes)
+        recyclerView.addOnScrollListener(object : Pagination(GridLayoutManager(requireContext(), 2)) {
+            override fun loadMoreItems() {
+                isLoading = true
+                currentPage++
+                doApiCall(getNotes)
             }
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val manager = GridLayoutManager(requireContext(), 2)
-                var currentItems = manager.childCount
-                var totalItems = manager.itemCount
-                var scrolledOutItems = manager.findFirstVisibleItemPosition()
-                if (isScrolling && (currentItems + scrolledOutItems == totalItems)) {
-                    isScrolling = false
-                    progressBar.visibility = View.VISIBLE
-                    getNotes = NotesServiceImpl().getUserNotes(context, recyclerView)
-                    adapter.notifyDataSetChanged()
-                    progressBar.visibility = View.GONE
+            override fun isLoading(): Boolean {
+                return isLoading
+            }
 
-                }
+            override fun isLastPage(): Boolean {
+                return isLastPage
             }
         })
         createNewNotes()
@@ -90,6 +101,28 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         toolbarIcons(toolbar, recyclerView, context)
         filterData()
         getUserProfilePicture(context)
+    }
+
+    private fun doApiCall(getNotes: ArrayList<NotesData>?) {
+        itemCount = 0
+        val items = ArrayList<NotesData>()
+        Handler().postDelayed(Runnable {
+            for (i in 0..10) {
+                if (getNotes?.size!! > 0 && itemCount < getNotes.size) {
+                    items.add(getNotes[itemCount])
+                    itemCount++
+                }
+            }
+            if (currentPage != PAGE_START)
+                adapter.removeLoading()
+            adapter.addItems(items)
+            swipeRefreshLayout.isRefreshing = false
+            if (currentPage < pageLimit)
+                adapter.addLoading()
+            else
+                isLastPage = true
+            isLoading = false
+        }, 1500)
     }
 
     private fun getUserProfilePicture(context: Context) {
@@ -148,7 +181,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         })
     }
 
-    fun profileDialog(context: Context) {
+    private fun profileDialog(context: Context) {
         val firebaseAuth = FirebaseAuth.getInstance()
         val uid = firebaseAuth.currentUser!!
         storageReference = FirebaseStorage.getInstance().getReference("uploads")
@@ -182,7 +215,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         builder.create().show()
     }
 
-    fun chooseImageFile() {
+    private fun chooseImageFile() {
         val intent = Intent()
         intent.setType("image/*")
         intent.setAction(Intent.ACTION_GET_CONTENT)
@@ -191,16 +224,30 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == image_request && resultCode == RESULT_OK && data != null && data.data != null) {
             imageUri = data.data!!
             profileImage.setImageURI(imageUri)
         }
     }
 
+    override fun onRefresh() {
+        itemCount = 0
+        currentPage = PAGE_START
+        isLastPage = false
+        adapter.clearList()
+        doApiCall(getNotes)
+    }
+
+    fun showList(context: Context) {
+        LabelService().retrieveLabelCollection(context, expandableListView)
+    }
+
     companion object {
         private const val image_request = 1
         private const val pageLimit = 10
-        private var isScrolling : Boolean = false
+        private var itemCount = 0
+        private var currentPage = PAGE_START
+        private var isLoading : Boolean = false
+        private var isLastPage : Boolean = false
     }
 }
