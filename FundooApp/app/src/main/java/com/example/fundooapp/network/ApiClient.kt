@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-const val BASEURL = "https://identitytoolkit.googleapis.com/v1/"
+const val BASEURL = "https://61dbbb724593510017aff9a3.mockapi.io/fundooapp/"
 class ApiClient {
     companion object {
         private var retrofit : Retrofit ?= null

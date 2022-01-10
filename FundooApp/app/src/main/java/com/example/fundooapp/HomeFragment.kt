@@ -8,13 +8,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,7 +21,6 @@ import com.example.fundooapp.Pagination.Companion.PAGE_START
 import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
-import com.example.fundooapp.network.ApiInterface
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
@@ -37,9 +33,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.Runnable
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class HomeFragment : Fragment(R.layout.fragment_home), SwipeRefreshLayout.OnRefreshListener {
     lateinit var imageUri: Uri
@@ -75,17 +68,17 @@ class HomeFragment : Fragment(R.layout.fragment_home), SwipeRefreshLayout.OnRefr
         progressBar = view.findViewById(R.id.progressBar)
         swipeRefreshLayout = view.findViewById(R.id.swipeRefresh)
         searchData = activity?.findViewById(R.id.searchButton)!!
-       // expandableListView = view.findViewById(R.id.expandableList)
+        //expandableListView = activity?.findViewById(R.id.expandableList)!!
         swipeRefreshLayout.setOnRefreshListener(this)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         adapter = NoteAdapter(ArrayList<NotesData>(), context)
         recyclerView.adapter = adapter
-        doApiCall(getNotes)
+        displayData(getNotes)
         recyclerView.addOnScrollListener(object : Pagination(GridLayoutManager(requireContext(), 2)) {
             override fun loadMoreItems() {
                 isLoading = true
                 currentPage++
-                doApiCall(getNotes)
+                displayData(getNotes)
             }
 
             override fun isLoading(): Boolean {
@@ -103,7 +96,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SwipeRefreshLayout.OnRefr
         getUserProfilePicture(context)
     }
 
-    private fun doApiCall(getNotes: ArrayList<NotesData>?) {
+    private fun displayData(getNotes: ArrayList<NotesData>?) {
         itemCount = 0
         val items = ArrayList<NotesData>()
         Handler().postDelayed(Runnable {
@@ -235,7 +228,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SwipeRefreshLayout.OnRefr
         currentPage = PAGE_START
         isLastPage = false
         adapter.clearList()
-        doApiCall(getNotes)
+        displayData(getNotes)
     }
 
     fun showList(context: Context) {

@@ -37,16 +37,15 @@ class ReminderDialog : DialogFragment(), DatePickerDialog.OnDateSetListener, Tim
         builder.setPositiveButton("Save", object : DialogInterface.OnClickListener {
             override fun onClick(dialog: DialogInterface?, p1: Int) {
                 val delay = calculateTimeDifference(hour, minute)
-                Log.d("Delay--->", "$delay")
-                val request = OneTimeWorkRequestBuilder<MyWorker>().setInitialDelay(2,
+                val request = OneTimeWorkRequestBuilder<MyWorker>().setInitialDelay(
+                    delay.toLong(),
                     TimeUnit.MINUTES
                 ).setInputData(workDataOf("Title" to bundle.getString("Title"),
                     "Content" to bundle.getString("Content"))).build()
                 WorkManager.getInstance(requireContext()).enqueue(request)
                 WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(request.id)
                     .observe(this@ReminderDialog, Observer<WorkInfo>() {
-                        var status = it.state.name
-                        Log.d("Notification status: ", status)
+                        Log.d("Notification status: ", it.state.name)
                     })
             }
         })
@@ -58,17 +57,36 @@ class ReminderDialog : DialogFragment(), DatePickerDialog.OnDateSetListener, Tim
         return builder.create()
     }
 
-    private fun calculateTimeDifference(hour: Int, minute: Int) : Long {
+    private fun calculateTimeDifference(hour: Int, minute: Int) : Int {
         val today = Calendar.getInstance()
-        var today_hr = today.get(Calendar.HOUR_OF_DAY)
-        var today_min = today.get(Calendar.MINUTE)
-        if (minute > today_min) {
-            --today_hr
-            today_min +=60
+        val today_hr = today.get(Calendar.HOUR_OF_DAY)
+        val today_min = today.get(Calendar.MINUTE)
+        if (hour == today_hr) {
+            if (minute > today_min)
+                return minute - today_min
+            else
+                return 0
+        } else if (hour == today_hr + 1) {
+            if (minute > today_min) {
+                return minute - today_min + 60
+            } else if (minute == today_min) {
+                return 60
+            } else {
+                return (60 - today_min) + minute
+            }
+        } else {
+            var timeDiff : Int = 0
+            var tempHr = hour
+            while (tempHr > today_hr + 1) {
+                timeDiff++
+                tempHr--
+            }
+            if (minute > today_min) {
+                return ((minute - today_min) + (timeDiff * 60))
+            } else {
+                return ((60 - today_min + minute) + (timeDiff * 60))
+            }
         }
-        val differenceInHour = hour - today_hr
-        val differenceInMinute = minute - today_min
-        return (differenceInHour + differenceInMinute).toLong()
     }
 
     private fun selectTime() {
@@ -102,6 +120,5 @@ class ReminderDialog : DialogFragment(), DatePickerDialog.OnDateSetListener, Tim
         timeBtn.text = hourOfDay.toString() +":"+minuteOfDay.toString()
         this.hour = hourOfDay
         this.minute = minuteOfDay
-        Log.d("Hour-->${this.hour}", "Minute--->${this.minute}")
     }
 }

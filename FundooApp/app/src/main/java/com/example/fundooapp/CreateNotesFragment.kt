@@ -55,11 +55,7 @@ class CreateNotesFragment : Fragment(R.layout.fragment_create_notes) {
         toolbar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.label -> {
-                    val currentDate = LocalDate.now()
-                    val customDate = LocalDate.of(2022, 4, 12)
-                    val delayDate = ChronoUnit.DAYS.between(currentDate, customDate)
-                    Log.d("Date::---->", "$delayDate")
-                    Toast.makeText(context, "Label Clicked", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "To be Implemented", Toast.LENGTH_SHORT).show()
                 }
                 R.id.Reminder -> {
                     addReminder()

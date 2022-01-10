@@ -1,6 +1,9 @@
 package com.example.fundooapp
 
+import android.app.AlertDialog
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +27,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var createNewAccount: TextView
     private lateinit var btnLogin: Button
+    private lateinit var forgotPassword : TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,18 +50,39 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         inputPassword = view.findViewById(R.id.LoginPassword)
         createNewAccount = view.findViewById(R.id.createNewAccount)
         btnLogin = view.findViewById(R.id.loginButton)
+        forgotPassword = view.findViewById(R.id.forgotPassword)
         firebaseAuth = FirebaseAuth.getInstance()
 
         gotoRegisterPage()
         loginUser()
+        resetPassword(requireContext())
+    }
+
+    private fun resetPassword(context: Context) {
+        forgotPassword.setOnClickListener {
+            val email = EditText(it.context)
+            val resetDialog = AlertDialog.Builder(context)
+            resetDialog.setView(email)
+            resetDialog.setTitle("Reset Password").setMessage("Enter email to reset password:").
+                setPositiveButton("Confirm", DialogInterface.OnClickListener { dialogInterface, i ->
+                    val resetEmail = email.text.toString()
+                    firebaseAuth.sendPasswordResetEmail(resetEmail).addOnSuccessListener {
+                        Toast.makeText(context, "Link Sent Successfully", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }).setNegativeButton("Cancel", DialogInterface.OnClickListener { dialogInterface, i ->
+            })
+            resetDialog.create().show()
+        }
     }
 
     private fun loginUser() {
         btnLogin.setOnClickListener {
-            var emailID = inputEmail.text.toString()
-            var password = inputPassword.text.toString()
+            val emailID = inputEmail.text.toString()
+            val password = inputPassword.text.toString()
             if (password.isEmpty() || password.length < 6)
-                inputPassword.setError("Enter valid password")
+                inputPassword.error = "Enter valid password"
             loginViewModel.loginToFundoo(emailID, password)
             loginViewModel.loginStatus.observe(viewLifecycleOwner, Observer {
                 Log.d(TAG, "loginUser: status ${it.status}")

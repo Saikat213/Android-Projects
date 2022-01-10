@@ -129,27 +129,33 @@ class MainActivity : AppCompatActivity() {
                     }
                     drawerL.closeDrawers()
                 }
-                R.id.nav_share -> Toast.makeText(context, "Share Clicked", Toast.LENGTH_SHORT).show()
-                R.id.nav_send -> Toast.makeText(context, "Send Clicked", Toast.LENGTH_SHORT).show()
+                R.id.nav_share -> {
+                    Toast.makeText(context, "Share Clicked", Toast.LENGTH_SHORT).show()
+                    drawerL.closeDrawers()
+                }
+                R.id.nav_send -> {
+                    Toast.makeText(context, "Send Clicked", Toast.LENGTH_SHORT).show()
+                    drawerL.closeDrawers()
+                }
             }
             true
         }
     }
 
-    fun retrofitServices(context: Context) {
+    private fun retrofitServices(context: Context) {
         val retrofit = ApiClient.getApiClient()
         val api = retrofit.create(ApiInterface::class.java)
-        api.fetchAllData().enqueue(object : Callback<List<NotesData>> {
+        api.fetchAllData().enqueue(object : Callback<NotesData> {
             override fun onResponse(
-                call: Call<List<NotesData>>,
-                response: Response<List<NotesData>>
+                call: Call<NotesData>,
+                response: Response<NotesData>
             ) {
-                Log.d("Retrofit-->", "${response.body()}")
-                sharedViewModel.gotoHomePage(true)
+                Log.d("Retrofit Response data-->", "${response.body()}")
             }
 
-            override fun onFailure(call: Call<List<NotesData>>, t: Throwable) {
+            override fun onFailure(call: Call<NotesData>, t: Throwable) {
                 Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
+                Log.d("Error--->", "${t.message}")
             }
         })
     }
