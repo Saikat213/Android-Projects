@@ -1,4 +1,3 @@
 package com.example.fundooapp.model
 
-class AuthListener(val status : Boolean, val message : String) {
-}
+data class AuthListener(val status : Boolean, val message : String)

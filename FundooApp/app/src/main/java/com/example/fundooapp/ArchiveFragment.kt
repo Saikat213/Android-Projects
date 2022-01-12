@@ -5,21 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundooapp.model.NotesData
 import com.example.fundooapp.model.NotesServiceImpl
-import com.example.fundooapp.network.ApiClient
-import com.example.fundooapp.network.ApiInterface
 import com.example.fundooapp.viewmodel.NoteAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ArchiveFragment : Fragment(R.layout.fragment_archive) {
     lateinit var archiveRecyclerView: RecyclerView

@@ -15,4 +15,10 @@ class LoginViewModel(val userAuthService: UserAuthService) : ViewModel() {
             _loginStatus.value = it
         }
     }
+
+    fun loginWithApi(emailID: String, password: String) {
+        userAuthService.loginWithRestApi(emailID, password) {
+            _loginStatus.value = it
+        }
+    }
 }

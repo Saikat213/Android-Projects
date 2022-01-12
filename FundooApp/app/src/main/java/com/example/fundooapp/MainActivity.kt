@@ -1,34 +1,19 @@
 package com.example.fundooapp
 
 import android.content.Context
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ImageView
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.MenuItemCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.fundooapp.model.NotesData
-import com.example.fundooapp.model.NotesServiceImpl
 import com.example.fundooapp.model.UserAuthService
-import com.example.fundooapp.network.ApiClient
-import com.example.fundooapp.network.ApiInterface
-import com.example.fundooapp.viewmodel.NoteAdapter
 import com.example.fundooapp.viewmodel.SharedViewModel
 import com.example.fundooapp.viewmodel.SharedViewModelFactory
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
@@ -54,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toggle.isDrawerIndicatorEnabled = true
         sharedViewModel.gotoLoginPage(true)
-        //retrofitServices(this)
         observeAppNav()
         onNavigationItemSelected(drawer, navView, this)
     }
@@ -124,7 +108,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.archive -> {
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, ArchiveFragment())
-                        addToBackStack(null)
                         commit()
                     }
                     drawerL.closeDrawers()
@@ -140,23 +123,5 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-    }
-
-    private fun retrofitServices(context: Context) {
-        val retrofit = ApiClient.getApiClient()
-        val api = retrofit.create(ApiInterface::class.java)
-        api.fetchAllData().enqueue(object : Callback<NotesData> {
-            override fun onResponse(
-                call: Call<NotesData>,
-                response: Response<NotesData>
-            ) {
-                Log.d("Retrofit Response data-->", "${response.body()}")
-            }
-
-            override fun onFailure(call: Call<NotesData>, t: Throwable) {
-                Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
-                Log.d("Error--->", "${t.message}")
-            }
-        })
     }
 }

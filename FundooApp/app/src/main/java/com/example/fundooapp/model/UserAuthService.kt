@@ -1,5 +1,9 @@
 package com.example.fundooapp.model
 
+import com.example.fundooapp.retrofitapi.Constants
+import com.example.fundooapp.retrofitapi.LoginListener
+import com.example.fundooapp.retrofitapi.LoginLoader
+import com.example.fundooapp.retrofitapi.LoginResponse
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 
@@ -41,5 +45,17 @@ class UserAuthService {
 
     fun signOut() {
         firebaseAuth.signOut()
+    }
+
+    fun loginWithRestApi(email : String, password: String, listener: (AuthListener) -> Unit) {
+        val loginLoader = LoginLoader()
+        loginLoader.getLogin(object : LoginListener {
+            override fun onLogin(response: LoginResponse?, status: Boolean, message: String) {
+                if (status) {
+                    Constants.getInstance()!!.setUserId(response!!.localId)
+                    listener(AuthListener(status, message))
+                }
+            }
+        }, email, password)
     }
 }

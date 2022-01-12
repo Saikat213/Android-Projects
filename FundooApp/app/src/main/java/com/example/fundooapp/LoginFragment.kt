@@ -34,7 +34,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var view: View = inflater.inflate(R.layout.fragment_login, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_login, container, false)
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory(UserAuthService()))
             .get(LoginViewModel::class.java)
         sharedViewModel = ViewModelProvider(
@@ -84,6 +84,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (password.isEmpty() || password.length < 6)
                 inputPassword.error = "Enter valid password"
             loginViewModel.loginToFundoo(emailID, password)
+            //loginViewModel.loginWithApi(emailID, password)
             loginViewModel.loginStatus.observe(viewLifecycleOwner, Observer {
                 Log.d(TAG, "loginUser: status ${it.status}")
                 if (it.status) {
