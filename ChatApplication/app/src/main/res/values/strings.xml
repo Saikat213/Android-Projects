@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">ChatApplication</string>
+    <string name="chatapp">ChatApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="verify_otp">OTP Verification</string>
+    <string name="get_otp">GET OTP</string>
+    <string name="enter_otp_sent_to">Enter OTP sent to</string>
+    <string name="didn_t_receive_the_otp">Didn\'t receive the otp?</string>
+    <string name="resend_otp">Resend OTP</string>
+    <string name="verify">VERIFY</string>
+    <string name="verify_phone_number">Verify Phone Number</string>
+    <string name="enter_country_code_and_phone_number">Enter country code and phone number</string>
+</resources>
