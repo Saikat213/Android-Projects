@@ -11,4 +11,7 @@
     <string name="verify">VERIFY</string>
     <string name="verify_phone_number">Verify Phone Number</string>
     <string name="enter_country_code_and_phone_number">Enter country code and phone number</string>
+    <string name="search">Search</string>
+    <string name="options">Options</string>
+    <string name="logout">Logout</string>
 </resources>

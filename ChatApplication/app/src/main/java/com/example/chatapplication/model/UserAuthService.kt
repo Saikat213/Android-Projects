@@ -1,5 +1,7 @@
 package com.example.chatapplication.model
 
+import androidx.lifecycle.ViewModelProvider
+import com.example.chatapplication.viewmodel.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class UserAuthService {
@@ -10,6 +12,5 @@ class UserAuthService {
     }
 
     fun registerUser(user: User, listener: (AuthListener) -> Unit) {
-
     }
 }

@@ -9,8 +9,8 @@
     <EditText
         android:id="@+id/phoneNumber"
         android:layout_width="210dp"
-        android:layout_height="53dp"
-        android:layout_marginEnd="36dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="40dp"
         android:ems="10"
         android:inputType="phone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -18,21 +18,20 @@
         app:layout_constraintTop_toBottomOf="@+id/subtitle"
         app:layout_constraintVertical_bias="0.079" />
 
-    <EditText
-        android:id="@+id/countryCode"
-        android:layout_width="79dp"
-        android:layout_height="53dp"
-        android:layout_marginStart="36dp"
-        android:ems="10"
-        android:inputType="phone"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageView
+        android:id="@+id/countryImage"
+        android:layout_width="45dp"
+        android:layout_height="37dp"
+        android:src="@drawable/indian_flag"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toStartOf="@+id/phoneNumber"
-        app:layout_constraintHorizontal_bias="0.238"
+        app:layout_constraintHorizontal_bias="0.634"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/subtitle"
-        app:layout_constraintVertical_bias="0.073" />
+        app:layout_constraintVertical_bias="0.382" />
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="374dp"
         android:layout_height="145dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -47,14 +46,14 @@
             android:layout_width="191dp"
             android:layout_height="53dp"
             android:layout_gravity="center"
-            android:text="@string/get_otp"/>
+            android:text="@string/get_otp" />
 
         <ProgressBar
             android:id="@+id/progressBar1"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </FrameLayout>
 

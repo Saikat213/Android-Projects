@@ -12,6 +12,7 @@ import com.example.chatapplication.R
 import com.example.chatapplication.model.UserAuthService
 import com.example.chatapplication.viewmodel.SharedViewModel
 import com.example.chatapplication.viewmodel.SharedViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 
 class SplashScreen : Fragment() {
     private lateinit var splashImage : ImageView
@@ -34,6 +35,9 @@ class SplashScreen : Fragment() {
         ))[SharedViewModel::class.java]
         splashImage.alpha = 0f
         splashImage.animate().setDuration(2000).alpha(1f).withEndAction {
+           /* if (FirebaseAuth.getInstance().currentUser != null) {
+                sharedViewModel.gotoHomePageStatus(true)
+            } else*/
             sharedViewModel.gotoRegisterPageStatus(true)
             activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }

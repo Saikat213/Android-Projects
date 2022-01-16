@@ -7,9 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapplication.R
 import com.example.chatapplication.model.UserAuthService
@@ -29,6 +27,8 @@ class VerifyOtp : Fragment() {
     private lateinit var displayNumber : TextView
     private lateinit var resendOtp : TextView
     private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var verifyOtp : Button
+    private lateinit var progressBar : ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +49,8 @@ class VerifyOtp : Fragment() {
         inputCode6 = view.findViewById(R.id.inputCode6)
         displayNumber = view.findViewById(R.id.mobileNumber)
         resendOtp = view.findViewById(R.id.resendOtp)
+        verifyOtp = view.findViewById(R.id.verifyOtp)
+        progressBar = view.findViewById(R.id.progressBar2)
         sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory(
             UserAuthService()))[SharedViewModel::class.java]
         bundle = this.requireArguments()
@@ -125,13 +127,19 @@ class VerifyOtp : Fragment() {
     }
 
     fun otpVerify(verificationId : String?) {
-        val otp = verifyValidOtp()
-        val phoneAuthCredential : PhoneAuthCredential = PhoneAuthProvider.getCredential(verificationId!!, "432178")
-        FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnSuccessListener {
-            Toast.makeText(requireContext(), "Registration Success", Toast.LENGTH_SHORT).show()
-            sharedViewModel.gotoHomePageStatus(true)
-        }.addOnFailureListener {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+        verifyOtp.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
+            verifyOtp.visibility = View.INVISIBLE
+            val otp = verifyValidOtp()
+            val phoneAuthCredential : PhoneAuthCredential = PhoneAuthProvider.getCredential(verificationId!!, otp!!)
+            FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnSuccessListener {
+                Toast.makeText(requireContext(), "Registration Success", Toast.LENGTH_SHORT).show()
+                sharedViewModel.gotoHomePageStatus(true)
+            }.addOnFailureListener {
+                progressBar.visibility = View.GONE
+                verifyOtp.visibility = View.VISIBLE
+                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

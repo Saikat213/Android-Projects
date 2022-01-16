@@ -54,4 +54,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }

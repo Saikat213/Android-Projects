@@ -171,14 +171,27 @@
                 android:textStyle="bold"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/verifyOtp"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="50dp"
-            android:text="@string/verify"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/verifyOtp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="50dp"
+                android:text="@string/verify"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/progressBar2"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
     </LinearLayout>
 
