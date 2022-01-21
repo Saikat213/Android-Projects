@@ -3,16 +3,22 @@ package com.example.chatapplication.view
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapplication.R
+import com.example.chatapplication.model.Constants
+import com.example.chatapplication.model.CustomSharedPreference
 import com.example.chatapplication.model.UserAuthService
 import com.example.chatapplication.viewmodel.SharedViewModel
 import com.example.chatapplication.viewmodel.SharedViewModelFactory
+import com.example.chatapplication.viewmodel.VerifyOtpViewModel
+import com.example.chatapplication.viewmodel.VerifyOtpViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
@@ -24,11 +30,11 @@ class VerifyOtp : Fragment() {
     private lateinit var inputCode4 : EditText
     private lateinit var inputCode5 : EditText
     private lateinit var inputCode6 : EditText
-    private lateinit var displayNumber : TextView
     private lateinit var resendOtp : TextView
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var verifyOtp : Button
     private lateinit var progressBar : ProgressBar
+    private lateinit var verifyOtpViewModel : VerifyOtpViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,27 +45,28 @@ class VerifyOtp : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bundle : Bundle
         var verificationId : String ?= null
+        var currentUserNumber : String ?= null
+        var newUser : String ?= null
         inputCode1 = view.findViewById(R.id.inputCode1)
         inputCode2 = view.findViewById(R.id.inputCode2)
         inputCode3 = view.findViewById(R.id.inputCode3)
         inputCode4 = view.findViewById(R.id.inputCode4)
         inputCode5 = view.findViewById(R.id.inputCode5)
         inputCode6 = view.findViewById(R.id.inputCode6)
-        displayNumber = view.findViewById(R.id.mobileNumber)
         resendOtp = view.findViewById(R.id.resendOtp)
         verifyOtp = view.findViewById(R.id.verifyOtp)
         progressBar = view.findViewById(R.id.progressBar2)
         sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory(
             UserAuthService()))[SharedViewModel::class.java]
-        bundle = this.requireArguments()
-        if (bundle != null) {
-            displayNumber.setText(bundle.getString("UserPhnNumber"))
-            verificationId = bundle.getString("VerificationId")
-        }
+        verifyOtpViewModel = ViewModelProvider(this, VerifyOtpViewModelFactory(
+            UserAuthService()))[VerifyOtpViewModel::class.java]
+        verificationId = CustomSharedPreference.get(Constants.VERIFICATION_ID)
+        currentUserNumber = CustomSharedPreference.get(Constants.EXISTING_USER)
+        newUser = CustomSharedPreference.get(Constants.NEW_USER)
+        Log.d(currentUserNumber, newUser!!)
         setupOtpInputs()
-        otpVerify(verificationId)
+        otpVerify(verificationId, currentUserNumber, newUser)
     }
 
     private fun setupOtpInputs() {
@@ -126,20 +133,25 @@ class VerifyOtp : Fragment() {
         })
     }
 
-    fun otpVerify(verificationId : String?) {
+    private fun otpVerify(verificationId : String?, currentUser : String?, newUser : String?) {
         verifyOtp.setOnClickListener {
             progressBar.visibility = View.VISIBLE
             verifyOtp.visibility = View.INVISIBLE
             val otp = verifyValidOtp()
             val phoneAuthCredential : PhoneAuthCredential = PhoneAuthProvider.getCredential(verificationId!!, otp!!)
-            FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnSuccessListener {
-                Toast.makeText(requireContext(), "Registration Success", Toast.LENGTH_SHORT).show()
-                sharedViewModel.gotoHomePageStatus(true)
-            }.addOnFailureListener {
-                progressBar.visibility = View.GONE
-                verifyOtp.visibility = View.VISIBLE
-                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-            }
+            verifyOtpViewModel.signInWithCredential(phoneAuthCredential)
+            verifyOtpViewModel.signInWithCredential.observe(viewLifecycleOwner, Observer {
+                if (it.status) {
+                    if (currentUser == newUser) {
+                        sharedViewModel.gotoHomePageStatus(true)
+                    } else {
+                        sharedViewModel.gotoRegisterPageStatus(true)
+                    }
+                } else {
+                    progressBar.visibility = View.GONE
+                    verifyOtp.visibility = View.VISIBLE
+                }
+            })
         }
     }
 

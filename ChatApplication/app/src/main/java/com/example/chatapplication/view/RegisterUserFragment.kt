@@ -1,5 +1,8 @@
 package com.example.chatapplication.view
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,25 +10,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapplication.R
+import com.example.chatapplication.model.Constants
 import com.example.chatapplication.model.User
 import com.example.chatapplication.model.UserAuthService
+import com.example.chatapplication.utility.FirebaseService
+import com.example.chatapplication.viewmodel.RegisterUserViewModel
+import com.example.chatapplication.viewmodel.RegisterUserViewModelFactory
 import com.example.chatapplication.viewmodel.SharedViewModel
 import com.example.chatapplication.viewmodel.SharedViewModelFactory
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
-import java.util.concurrent.TimeUnit
+import de.hdodenhof.circleimageview.CircleImageView
 
 class RegisterUserFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var userPhnNumber : EditText
-    private lateinit var getOTP : Button
-    private lateinit var progressBar: ProgressBar
+    private lateinit var profileImage : CircleImageView
+    private lateinit var username : EditText
+    private lateinit var userNumber : EditText
+    private lateinit var registerUser : Button
+    private lateinit var imageUri : Uri
+    private lateinit var registerUserViewModel: RegisterUserViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,57 +42,50 @@ class RegisterUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory(
-            UserAuthService()
-        )
-        )[SharedViewModel::class.java]
-        userPhnNumber = view.findViewById(R.id.phoneNumber)
-        getOTP = view.findViewById(R.id.getOtp)
-        progressBar = view.findViewById(R.id.progressBar1)
-        getOtpVerification()
+            UserAuthService()))[SharedViewModel::class.java]
+        registerUserViewModel = ViewModelProvider(this, RegisterUserViewModelFactory(
+            FirebaseService()))[RegisterUserViewModel::class.java]
+        profileImage = view.findViewById(R.id.registerPicture)
+        username = view.findViewById(R.id.userName)
+        userNumber = view.findViewById(R.id.userNumber)
+        registerUser = view.findViewById(R.id.register)
+        onImageClick()
+        registerUserToFirebase()
     }
 
-    private fun getOtpVerification() {
-        getOTP.setOnClickListener {
-            val phoneNumber = userPhnNumber.text.toString()
-            val user = User("User1", phoneNumber, "+91")
-            progressBar.visibility = View.VISIBLE
-            getOTP.visibility = View.INVISIBLE
-            sendVerificationCode(user)
+    private fun registerUserToFirebase() {
+        registerUser.setOnClickListener {
+            val name = username.text.toString()
+            val number = userNumber.text.toString()
+            val image = FirebaseService().uploadUserProfilePicture(imageUri, requireContext())
+            val userDetails = User(name, number, "+91", image)
+            registerUserViewModel.addUserDetails(userDetails)
+            registerUserViewModel.registerUserDetailsToFirebase.observe(viewLifecycleOwner, Observer {
+                if (it.status)
+                    sharedViewModel.gotoHomePageStatus(true)
+            })
         }
     }
 
-    fun sendVerificationCode(user: User) {
-        val phnAuth = PhoneAuthOptions.newBuilder(FirebaseAuth.getInstance()).setPhoneNumber("+91" + user.phoneNumber)
-            .setTimeout(60, TimeUnit.SECONDS).setActivity(requireActivity()).setCallbacks(object :
-                PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
-                    progressBar.visibility = View.GONE
-                    getOTP.visibility = View.VISIBLE
-                    val code = phoneAuthCredential.smsCode
-                    Log.d("Sms code--->", code!!)
-                }
+    private fun onImageClick() {
+        profileImage.setOnClickListener {
+            chooseImageFile()
+        }
+    }
 
-                override fun onVerificationFailed(exception: FirebaseException) {
-                    progressBar.visibility = View.GONE
-                    getOTP.visibility = View.VISIBLE
-                    Toast.makeText(requireContext(), exception.message, Toast.LENGTH_LONG).show()
-                }
+    fun chooseImageFile() {
+        val intent = Intent()
+        intent.setType("image/*")
+        intent.setAction(Intent.ACTION_GET_CONTENT)
+        startActivityForResult(intent, Constants.IMAGE_REQUEST)
+    }
 
-                override fun onCodeSent(verificationID: String, forceResendingToken: PhoneAuthProvider.ForceResendingToken) {
-                    progressBar.visibility = View.GONE
-                    getOTP.visibility = View.VISIBLE
-                    val bundle = Bundle()
-                    bundle.putString("VerificationId", verificationID)
-                    bundle.putString("UserPhnNumber", user.phoneNumber)
-                    val verifyOtp = VerifyOtp()
-                    verifyOtp.arguments = bundle
-                    (activity as AppCompatActivity).supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, verifyOtp)
-                        commit()
-                    }
-                    //sharedViewModel.gotoVerifyOtpPageStatus(true)
-                }
-            }).build()
-        PhoneAuthProvider.verifyPhoneNumber(phnAuth)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.IMAGE_REQUEST && resultCode == RESULT_OK && data != null
+            && data.data != null) {
+            imageUri = data.data!!
+            profileImage.setImageURI(imageUri)
+        }
     }
 }

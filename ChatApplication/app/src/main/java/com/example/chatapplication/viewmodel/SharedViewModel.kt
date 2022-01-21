@@ -15,6 +15,9 @@ class SharedViewModel(val userAuthService: UserAuthService) : ViewModel() {
     private val _gotoVerifyOtpPageStatus = MutableLiveData<Boolean>()
     val gotoVerifyOtpPageStatus = _gotoVerifyOtpPageStatus as LiveData<Boolean>
 
+    private val _gotoGetOtpPageStatus = MutableLiveData<Boolean>()
+    val gotoGetOtpPageStatus = _gotoGetOtpPageStatus as LiveData<Boolean>
+
     fun gotoHomePageStatus(status : Boolean) {
         _gotoHomePageStatus.value = status
     }
@@ -25,5 +28,9 @@ class SharedViewModel(val userAuthService: UserAuthService) : ViewModel() {
 
     fun gotoVerifyOtpPageStatus(status: Boolean) {
         _gotoVerifyOtpPageStatus.value = status
+    }
+
+    fun gotoGetOtpPageStatus(status: Boolean) {
+        _gotoGetOtpPageStatus.value = status
     }
 }

@@ -1,6 +1,7 @@
 package com.example.chatapplication.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapplication.R
+import com.example.chatapplication.model.Constants
+import com.example.chatapplication.model.CustomSharedPreference
 import com.example.chatapplication.model.UserAuthService
 import com.example.chatapplication.viewmodel.SharedViewModel
 import com.example.chatapplication.viewmodel.SharedViewModelFactory
@@ -35,11 +38,17 @@ class SplashScreen : Fragment() {
         ))[SharedViewModel::class.java]
         splashImage.alpha = 0f
         splashImage.animate().setDuration(2000).alpha(1f).withEndAction {
-           /* if (FirebaseAuth.getInstance().currentUser != null) {
+            if (FirebaseAuth.getInstance().currentUser != null) {
                 sharedViewModel.gotoHomePageStatus(true)
-            } else*/
-            sharedViewModel.gotoRegisterPageStatus(true)
-            activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            } else {
+                val currentUser = FirebaseAuth.getInstance().currentUser?.phoneNumber
+                if (currentUser != null) {
+                    CustomSharedPreference.initSharedPreference(requireContext())
+                    CustomSharedPreference.addString(Constants.EXISTING_USER, currentUser)
+                }
+                sharedViewModel.gotoGetOtpPageStatus(true)
+                activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            }
         }
     }
 }

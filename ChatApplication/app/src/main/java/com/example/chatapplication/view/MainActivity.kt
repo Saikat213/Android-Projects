@@ -46,6 +46,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+        sharedViewModel.gotoGetOtpPageStatus.observe(this, Observer {
+            if (it) {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragmentContainer, GetOtpFragment())
+                    commit()
+                }
+            }
+        })
     }
 
     private fun splashScreen() {

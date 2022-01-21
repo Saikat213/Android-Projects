@@ -6,83 +6,64 @@
     android:layout_height="match_parent"
     tools:context=".view.RegisterUserFragment">
 
-    <EditText
-        android:id="@+id/phoneNumber"
-        android:layout_width="210dp"
-        android:layout_height="45dp"
-        android:layout_marginEnd="40dp"
-        android:ems="10"
-        android:inputType="phone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle"
-        app:layout_constraintVertical_bias="0.079" />
-
-    <ImageView
-        android:id="@+id/countryImage"
-        android:layout_width="45dp"
-        android:layout_height="37dp"
-        android:src="@drawable/indian_flag"
-        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
-        app:layout_constraintEnd_toStartOf="@+id/phoneNumber"
-        app:layout_constraintHorizontal_bias="0.634"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle"
-        app:layout_constraintVertical_bias="0.382" />
-
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="374dp"
-        android:layout_height="145dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.486"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phoneNumber"
-        app:layout_constraintVertical_bias="0.206">
-
-        <Button
-            android:id="@+id/getOtp"
-            android:layout_width="191dp"
-            android:layout_height="53dp"
-            android:layout_gravity="center"
-            android:text="@string/get_otp" />
-
-        <ProgressBar
-            android:id="@+id/progressBar1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/subtitle"
-        android:layout_width="361dp"
-        android:layout_height="63dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
+    <Button
+        android:id="@+id/register"
+        android:layout_width="306dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="96dp"
         android:gravity="center"
-        android:text="@string/enter_country_code_and_phone_number"
-        android:textSize="20sp"
-        android:textStyle="bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titlePage" />
-
-    <TextView
-        android:id="@+id/titlePage"
-        android:layout_width="335dp"
-        android:layout_height="70dp"
-        android:layout_marginTop="48dp"
-        android:gravity="center"
-        android:text="@string/verify_phone_number"
-        android:textColor="@color/black"
-        android:textSize="30sp"
+        android:text="@string/register"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userNumber" />
+
+    <EditText
+        android:id="@+id/userNumber"
+        android:layout_width="224dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="36dp"
+        android:hint="Enter Number"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userName" />
+
+    <EditText
+        android:id="@+id/userName"
+        android:layout_width="224dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="60dp"
+        android:hint="Enter Name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerPicture" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="299dp"
+        android:layout_height="46dp"
+        android:text="Complete Profile"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/registerPicture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/registerPicture"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="104dp"
+        android:src="@drawable/ic_account"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
