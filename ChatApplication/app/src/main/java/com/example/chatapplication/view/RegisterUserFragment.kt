@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapplication.R
 import com.example.chatapplication.model.Constants
+import com.example.chatapplication.model.CustomSharedPreference
 import com.example.chatapplication.model.User
 import com.example.chatapplication.model.UserAuthService
 import com.example.chatapplication.utility.FirebaseService
@@ -57,8 +58,8 @@ class RegisterUserFragment : Fragment() {
         registerUser.setOnClickListener {
             val name = username.text.toString()
             val number = userNumber.text.toString()
-            val image = FirebaseService().uploadUserProfilePicture(imageUri, requireContext())
-            val userDetails = User(name, number, "+91", image)
+            val userDetails = User(name, number, "+91")
+            FirebaseService().uploadUserProfilePicture(imageUri, requireContext())
             registerUserViewModel.addUserDetails(userDetails)
             registerUserViewModel.registerUserDetailsToFirebase.observe(viewLifecycleOwner, Observer {
                 if (it.status)
