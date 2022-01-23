@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapplication.R
@@ -13,6 +14,8 @@ import com.example.chatapplication.model.CustomSharedPreference
 import com.example.chatapplication.model.UserMessages
 import com.example.chatapplication.utility.FirebaseService
 import com.example.chatapplication.utility.MessageAdapter
+import com.example.chatapplication.viewmodel.ChatDetailsViewModel
+import com.example.chatapplication.viewmodel.ChatDetailsViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,6 +26,7 @@ class ChatDetailsFragment : Fragment() {
     private lateinit var sendMessage : ImageView
     private lateinit var singleChatRecyclerView: RecyclerView
     private lateinit var messageAdapter : MessageAdapter
+    private lateinit var chatDetailsViewModel: ChatDetailsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +37,8 @@ class ChatDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        chatDetailsViewModel = ViewModelProvider(this, ChatDetailsViewModelFactory(
+            FirebaseService()))[ChatDetailsViewModel::class.java]
         val context = requireContext()
         displayUserNumber = view.findViewById(R.id.userPhn)
         displayUserNumber.text = CustomSharedPreference.get("ChatWith")
@@ -45,10 +51,10 @@ class ChatDetailsFragment : Fragment() {
         messageAdapter = MessageAdapter(ArrayList<UserMessages>(), context)
         singleChatRecyclerView.adapter = messageAdapter
         FirebaseService().retrieveUserChats(context, singleChatRecyclerView)
-        sendMessageToUser()
+        chatBetweenUsers()
     }
 
-    private fun sendMessageToUser() {
+    private fun chatBetweenUsers() {
         sendMessage.setOnClickListener {
             val message = enterMessage.text.toString()
             if (message.isEmpty())
@@ -56,8 +62,11 @@ class ChatDetailsFragment : Fragment() {
             else {
                 enterMessage.setText("")
                 val date : Date = Date()
-                val userMessage = UserMessages(message, FirebaseAuth.getInstance().currentUser!!.uid, date.time)
-                FirebaseService().uploadUserChats(userMessage)
+                val userMessage = UserMessages(message, FirebaseAuth.getInstance().currentUser!!.uid,
+                    date.time)
+                chatDetailsViewModel.sendMessageToUser(userMessage)
+                chatDetailsViewModel.uploadChatDetails.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                })
             }
         }
     }

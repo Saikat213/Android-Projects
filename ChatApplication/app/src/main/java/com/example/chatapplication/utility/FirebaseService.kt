@@ -74,7 +74,8 @@ class FirebaseService {
                 for (documents: DocumentChange in value?.documentChanges!!) {
                     if (documents.type == DocumentChange.Type.ADDED) {
                         val data = documents.document.toObject(User::class.java)
-                        userDetails.add(data)
+                        if ("+91" + data.PhoneNumber != firebaseAuth.currentUser!!.phoneNumber)
+                            userDetails.add(data)
                     }
                 }
                 myAdapter.notifyDataSetChanged()
@@ -83,11 +84,15 @@ class FirebaseService {
         })
     }
 
-    fun uploadUserChats(message : UserMessages) {
+    fun uploadUserChats(message : UserMessages, listener: (AuthListener) -> Unit) {
         db.collection("Chats").document(senderRoom).collection("Messages")
             .document().set(message).addOnCompleteListener {
                 db.collection("Chats").document(receiverRoom).collection("Messages")
                     .document().set(message).addOnCompleteListener {
+                        if (it.isSuccessful)
+                            listener(AuthListener(true, "Upload Success"))
+                        else
+                            listener(AuthListener(false, "Failed"))
                     }
             }
     }
@@ -95,7 +100,8 @@ class FirebaseService {
     fun retrieveUserChats(context: Context, recyclerView: RecyclerView) {
         val chatMessages = ArrayList<UserMessages>()
         val myadapter = MessageAdapter(chatMessages, context)
-        chatReference.collection("Messages").addSnapshotListener(object : EventListener<QuerySnapshot> {
+        chatReference.collection("Messages").orderBy("timeStamp")
+            .addSnapshotListener(object : EventListener<QuerySnapshot> {
             override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
                 if (error != null) {
                     Log.d("MessageError-->", error.message.toString())
