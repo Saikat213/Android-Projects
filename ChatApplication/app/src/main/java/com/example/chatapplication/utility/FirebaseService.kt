@@ -3,18 +3,19 @@ package com.example.chatapplication.utility
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapplication.model.AuthListener
 import com.example.chatapplication.model.CustomSharedPreference
 import com.example.chatapplication.model.User
 import com.example.chatapplication.model.UserMessages
 import com.example.chatapplication.view.ToastMessages
+import com.example.chatapplication.viewmodel.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
 
 class FirebaseService {
     private val db : FirebaseFirestore
@@ -116,6 +117,53 @@ class FirebaseService {
                 recyclerView.adapter = MessageAdapter(chatMessages, context)
             }
         })
+    }
+
+    fun retrieveUserProfileDetails(context: Context) : ArrayList<User> {
+        var userdata = ArrayList<User>()
+        db.collection("Users").addSnapshotListener(object : EventListener<QuerySnapshot> {
+            override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
+                if (error != null) {
+                    Log.d("Firestore Error", error.message.toString())
+                }
+                for (documents: DocumentChange in value?.documentChanges!!) {
+                    if (documents.type == DocumentChange.Type.ADDED) {
+                        val data = documents.document.toObject(User::class.java)
+                        if ("+91" + data.PhoneNumber == firebaseAuth.currentUser!!.phoneNumber){
+                            userdata.add(data)
+                        }
+                    }
+                }
+            }
+        })
+        return userdata
+    }
+
+    fun updateUserProfile(user : User, listener : (AuthListener) -> Unit) {
+        val documentReference = db.collection("Users").document(userID)
+        val fileReference = storageReference.child("image/${userID}.jpg")
+        documentReference.update("Name", user.Name)
+        fileReference.downloadUrl.addOnSuccessListener {
+            documentReference.update("ImageUri", it.toString()).addOnCompleteListener {
+                if (it.isSuccessful)
+                    listener(AuthListener(true, "Update Success"))
+                else
+                    listener(AuthListener(true, "Failed"))
+            }
+        }
+    }
+
+    fun retrieveUserProfilePicture(context: Context, userImage : ImageView) {
+        storageReference.child("image/${userID}.jpg").downloadUrl.addOnSuccessListener {
+            Picasso.with(context).load(it).into(userImage)
+        }.addOnFailureListener {
+            ToastMessages().displayMessage(context, it.message.toString())
+        }
+    }
+
+    fun signoutUser(sharedViewModel: SharedViewModel) {
+        firebaseAuth.signOut()
+        sharedViewModel.gotoGetOtpPageStatus(true)
     }
 }
 

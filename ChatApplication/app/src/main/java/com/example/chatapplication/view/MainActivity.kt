@@ -54,6 +54,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+        sharedViewModel.gotoUpdateProfilePageStatus.observe(this, Observer {
+            if (it) {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragmentContainer, UpdateProfile())
+                    addToBackStack(null)
+                    commit()
+                }
+            }
+        })
     }
 
     private fun splashScreen() {
