@@ -18,16 +18,15 @@ class FcmMessageService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         if (remoteMessage.notification!!.body!!.isNotEmpty()) {
             val message = mutableMapOf<String, String>()
-            message.put("UserPhoneNumber", remoteMessage.notification!!.title!!)
-            message.put("LastMessage", remoteMessage.notification!!.body!!)
+            //message.put("UserPhoneNumber", remoteMessage.notification!!.title!!)
+            message.put("message", remoteMessage.data["message"]!!)
             sendNotifications(message, applicationContext)
         }
     }
 
     private fun sendNotifications(message : MutableMap<String, String>, context: Context) {
         val jobRequest = OneTimeWorkRequestBuilder<MyWorker>()
-            .setInputData(workDataOf("UserPhoneNumber" to message.get("UserPhoneNumber"),
-                "LastMessage" to message.get("LastMessage"))).build()
+            .setInputData(workDataOf("message" to message.get("message"))).build()
         WorkManager.getInstance(context).enqueue(jobRequest)
     }
 }

@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.chatapplication.R
+import com.example.chatapplication.model.Constants
 import com.example.chatapplication.model.UserAuthService
 import com.example.chatapplication.viewmodel.SharedViewModel
 import com.example.chatapplication.viewmodel.SharedViewModelFactory
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel

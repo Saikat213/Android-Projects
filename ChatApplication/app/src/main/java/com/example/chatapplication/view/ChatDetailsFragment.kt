@@ -10,13 +10,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapplication.R
-import com.example.chatapplication.model.CustomSharedPreference
-import com.example.chatapplication.model.UserMessages
+import com.example.chatapplication.model.*
+import com.example.chatapplication.model.Constants.TOPIC
 import com.example.chatapplication.utility.FirebaseService
 import com.example.chatapplication.utility.MessageAdapter
 import com.example.chatapplication.viewmodel.ChatDetailsViewModel
 import com.example.chatapplication.viewmodel.ChatDetailsViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -39,6 +40,7 @@ class ChatDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         chatDetailsViewModel = ViewModelProvider(this, ChatDetailsViewModelFactory(
             FirebaseService()))[ChatDetailsViewModel::class.java]
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
         val context = requireContext()
         displayUserNumber = view.findViewById(R.id.userPhn)
         displayUserNumber.text = CustomSharedPreference.get("ChatWith")
@@ -64,6 +66,9 @@ class ChatDetailsFragment : Fragment() {
                 val date : Date = Date()
                 val userMessage = UserMessages(message, FirebaseAuth.getInstance().currentUser!!.uid,
                     date.time)
+                SendNotifications(NotificationData("Demo", message), TOPIC).also {
+                    UserAuthService().pushNotifications(it)
+                }
                 chatDetailsViewModel.sendMessageToUser(userMessage)
                 chatDetailsViewModel.uploadChatDetails.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
                 })

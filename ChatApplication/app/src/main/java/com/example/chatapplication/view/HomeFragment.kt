@@ -3,7 +3,6 @@ package com.example.chatapplication.view
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +16,6 @@ import com.example.chatapplication.model.UserAuthService
 import com.example.chatapplication.utility.FirebaseService
 import com.example.chatapplication.viewmodel.SharedViewModel
 import com.example.chatapplication.viewmodel.SharedViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
 
 class HomeFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
