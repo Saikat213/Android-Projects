@@ -12,4 +12,6 @@ object Constants {
     const val CONTENT_TYPE = "application/json"
     const val CHANNEL_ID = "ChatApp"
     const val TOPIC = "/topics/chatStarted"
+    const val tokenOfNexusUser = "d76bAA_6SU2wSvZsGHcjzV:APA91bGn4Z9G-BpPc6G2g2RWfmYkA3JVKt99vJst-20WRqNNKFTlsSL1wJdBQYqMCVhuBZtURSgmoBbaSiyo2nr7hMN3EG20ZXfewwui1PimYEvYU-BxzgKPYS-N2yL9rUM_ZHUxwRNi"
+    const val tokenOfPixel4User = "f8pQsEjpQx2Vbxro8m5DF2:APA91bE4jvXwOLCl2mCC-9-ugJf4f2X_eoXQKfpflErLfrMhcHmKzkLfiROXFl7CY-xadPxY9zBL5X7BAFfKuhw5OZ6HhwImbrcjzcOITwUhWUF1PRfajTlid6VX2nWq78TXqUYJO6fH"
 }

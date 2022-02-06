@@ -1,6 +1,8 @@
 package com.example.chatapplication.model
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.example.chatapplication.utility.RetrofitInstance
 import com.example.chatapplication.view.ToastMessages
 import com.google.firebase.auth.FirebaseAuth
@@ -11,6 +13,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class UserAuthService {
     private val firebaseAuth : FirebaseAuth
@@ -31,29 +36,31 @@ class UserAuthService {
         }
     }
 
-    fun fetchFcmToken() : String {
-        var token : String ?= null
+    fun fetchFcmToken() {
+        var token : String
         FirebaseMessaging.getInstance().token.addOnCompleteListener{
             if (!it.isSuccessful) {
                 Log.d("Token Error--->", "${it.exception}")
                 return@addOnCompleteListener
             }
             token = it.result
-            Log.d("Token--->", "$token")
         }
-        return token!!
     }
 
-    fun pushNotifications(notification : SendNotifications) = CoroutineScope(Dispatchers.IO).launch{
-        try {
-            val response = RetrofitInstance.api.postNotification(notification)
-            Log.d("Response--->", "$response")
-            if (response.isSuccessful)
-                Log.d("CoroutineResponse", Gson().toJson(response))
-            else
-                Log.d("CoroutineResponseError", response.code().toString())
-        }catch (exception : Exception) {
-            Log.d("CoroutineContext", exception.toString())
-        }
+    fun pushNotifications(context : Context, notification : String) {
+        RetrofitInstance.api.postNotification(notification).enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                Log.d("ResponseCode--->", response.code().toString())
+                if (response.isSuccessful) {
+                    if (response.body()!!.isNotEmpty()) {
+                        Log.d("success--->", response.body().toString())
+                        ToastMessages().displayMessage(context, "Notified")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+            }
+        })
     }
 }

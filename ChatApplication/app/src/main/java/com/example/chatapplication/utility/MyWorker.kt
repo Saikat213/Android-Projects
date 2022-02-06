@@ -19,12 +19,13 @@ import kotlin.random.Random
 class MyWorker(val context: Context, workerParams : WorkerParameters) : Worker(context, workerParams) {
     override fun doWork(): Result {
         val taskData = inputData.keyValueMap
+        val sentFromUser = taskData.getValue("SenderID")
         val message = taskData.getValue("message")
-        scheduleNotifications(message.toString(), context)
+        scheduleNotifications(sentFromUser.toString(), message.toString(), context)
         return Result.success()
     }
 
-    private fun scheduleNotifications(message : String, context: Context) {
+    private fun scheduleNotifications(sentFrom : String, message : String, context: Context) {
         val notificationManager : NotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(context, MainActivity::class.java)
         //val notificationID = Random.nextInt()
@@ -35,7 +36,7 @@ class MyWorker(val context: Context, workerParams : WorkerParameters) : Worker(c
             notificationManager.createNotificationChannel(channel)
         }
         val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setContentTitle("RetrofitTest").setContentText(message)
+            .setContentTitle(sentFrom).setContentText(message)
             .setSmallIcon(R.drawable.ic_notifications).setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
